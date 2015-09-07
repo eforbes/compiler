@@ -23,6 +23,7 @@
 #include "Token.h"
 #include "symbol_table.h"
 #include "reserved_words.h"
+#include "lexerr.h"
 
 #ifndef NULL
 #define NULL   ((void *) 0)
@@ -34,7 +35,7 @@ char buffer[LINE_MAX];
 FILE *inputFile, *outputFile, *tokenFile;
 
 int line_number = 1;
-int b = 0, f = 0;
+int b = 0, f = 0; // indexes within the buffer
 
 void open_files(char *inputFileName) {
 	char outputFileName[strlen(inputFileName)+6];
@@ -84,6 +85,7 @@ Token *run_next_machine() {
 void process_file(char *inputFileName) {
 	init_reserved_words();
 	init_symbol_table();
+	init_lexerr();
 
 	while(load_line(inputFileName) != NULL) {
 		fprintf(outputFile, "%d\t\t%s", line_number, buffer);
@@ -105,8 +107,8 @@ void process_file(char *inputFileName) {
 			lexeme[length] = '\0';
 
 			if(result -> token == TOK_LEXERR) {
-				//TODO: print helpful error message
-				fprintf(outputFile, "LEXERR:\t%s (lexerr #%d)\n", lexeme, result -> attribute);
+				char *err_text = get_err_text(result ->attribute);
+				fprintf(outputFile, "LEXERR:\t%s: %s (lexerr #%d)\n", err_text, lexeme, result -> attribute);
 			}
 
 			if(result -> token != TOK_WS) {
@@ -149,7 +151,7 @@ void move_f_back() {
 }
 
 int main(void) {
-	process_file("example.txt");
+	process_file("example2.txt");
 	puts("Done");
 	return 0;
 }
