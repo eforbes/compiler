@@ -5,7 +5,8 @@
  *      Author: Evan
  */
 
-#include "Token.h"
+#include "token.h"
+
 #include <stdlib.h>
 
 Token *token_new(int token_in, int attribute_in) {

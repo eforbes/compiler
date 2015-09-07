@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "Token.h"
 #include "reserved_words.h"
+#include "token.h"
 
 #ifndef NULL
 #define NULL   ((void *) 0)

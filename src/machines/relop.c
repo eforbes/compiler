@@ -1,11 +1,11 @@
 
-#include "../LexicalAnalyzer.h"
-#include "../Token.h"
 #include "relop.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../lexan.h"
+#include "../token.h"
 
 
 static int state = 0;

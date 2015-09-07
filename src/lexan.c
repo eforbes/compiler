@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "machines/Whitespace.h"
 #include "machines/id.h"
 #include "machines/long_real.h"
 #include "machines/real.h"
@@ -20,10 +19,11 @@
 #include "machines/mulop.h"
 #include "machines/catch_all.h"
 
-#include "Token.h"
 #include "symbol_table.h"
 #include "reserved_words.h"
 #include "lexerr.h"
+#include "machines/ws.h"
+#include "token.h"
 
 #ifndef NULL
 #define NULL   ((void *) 0)
@@ -52,7 +52,7 @@ void open_files(char *inputFileName) {
 }
 
 char* load_line(char *inputFileName) {
-	if(inputFile==NULL && inputFileName!=NULL) {
+	if(inputFile==NULL && inputFileName != NULL) {
 		open_files(inputFileName);
 	}
 	if(inputFile == NULL || outputFile == NULL) {

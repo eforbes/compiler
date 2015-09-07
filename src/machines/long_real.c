@@ -1,11 +1,10 @@
 
-#include "../LexicalAnalyzer.h"
-#include "../Token.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "../lexan.h"
+#include "../token.h"
 
 #define LONG_REAL_MAX_X_LENGTH 5
 #define LONG_REAL_MAX_Y_LENGTH 5

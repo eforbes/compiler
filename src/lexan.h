@@ -5,11 +5,11 @@
  *      Author: Evan
  */
 
-#ifndef LEXICALANALYZER_H_
-#define LEXICALANALYZER_H_
+#ifndef LEXAN_H_
+#define LEXAN_H_
 
 char next_char();
 void move_f_back();
 char *get_lexeme();
 
-#endif /* LEXICALANALYZER_H_ */
+#endif /* LEXAN_H_ */

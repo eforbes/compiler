@@ -6,12 +6,11 @@
  */
 
 
-#include "../LexicalAnalyzer.h"
-#include "../Token.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../lexan.h"
+#include "../token.h"
 
 int match_ws(char c) {
 	return c == '\t' || c == ' ';

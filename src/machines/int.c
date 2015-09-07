@@ -1,11 +1,10 @@
 
-#include "../LexicalAnalyzer.h"
-#include "../Token.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "../lexan.h"
+#include "../token.h"
 
 #define INT_MAX_LENGTH 10
 

@@ -8,7 +8,7 @@
 #ifndef RESERVED_WORDS_H_
 #define RESERVED_WORDS_H_
 
-#include "Token.h"
+#include "token.h"
 
 struct ReservedWordNode {
 	char *word;

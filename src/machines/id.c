@@ -1,6 +1,4 @@
 
-#include "../LexicalAnalyzer.h"
-#include "../Token.h"
 #include "../symbol_table.h"
 #include "../reserved_words.h"
 
@@ -8,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "../lexan.h"
+#include "../token.h"
 
 #define ID_MAX_LENGTH 10
 
