@@ -1,11 +1,12 @@
-1	program example(input, output);
-2	var x, y: integer;
-3	function gcd(a, b: integer): integer;
-4	begin
-5		if b = 0 then gcd := a
-6		else gcd := gcd(b, a mod b)
-7	end;
-8	begin
-9		read(x, y);
-10		write(gcd(x, y))
-11	end.
+1		program example(input, output);
+2		var x, y: integer;
+3		function gcd(a, b: integer): integer;
+4		begin
+5			if b = 12345678999 then gcd := a
+LEXERR:	12345678999 (lexerr #130)
+6			else gcd := gcd(b, a mod b)
+7		end;
+8		begin
+9			read(x, y);
+10			write(gcd(x, y))
+11		end.

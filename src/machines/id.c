@@ -2,6 +2,7 @@
 #include "../LexicalAnalyzer.h"
 #include "../Token.h"
 #include "../symbol_table.h"
+#include "../reserved_words.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,12 +38,14 @@ static Token *advance() {
 			if(count > ID_MAX_LENGTH) {
 				result_token = token_new(TOK_LEXERR, 1);
 			} else {
-				//todo: check if reserved word
-
-				void *m = get_or_add_symbol(get_lexeme());
-				result_token = token_mem_new(TOK_ID, m);
+				char *lexeme = get_lexeme();
+				result_token = get_reserved_token(lexeme);
+				if(result_token->token == TOK_BLOCKED) {
+					//not reserved word
+					void *m = get_or_add_symbol(lexeme);
+					result_token = token_mem_new(TOK_ID, m);
+				}
 			}
-
 		}
 	}
 

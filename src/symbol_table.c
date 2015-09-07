@@ -42,7 +42,8 @@ void *get_or_add_symbol(char *sym) {
 	head = new;
 	return new_sym;
 }
-
 void init_symbol_table() {
-	head = symbol_table_node_new("", NULL);
+	char *null_s = malloc(sizeof(char[1]));
+	null_s[0] = '\0';
+	head = symbol_table_node_new(null_s, NULL);
 }

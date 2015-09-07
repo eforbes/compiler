@@ -7,7 +7,7 @@
 7	0
 8	0.5
 9	thisistoolong
-LEXERR:	thisistoolong	0
+LEXERR:	thisistoolong	1
 10	id3ntifier := 5
 11	12345678999
 LEXERR:	12345678999	130
@@ -36,3 +36,8 @@ LEXERR:	0012345.0012345	267
 24	12345.12345E-99
 25	123456.123456E123
 LEXERR:	123456.123456E123	538
+26	program
+27	begin
+28	end
+29	or and?
+LEXERR:	?	99

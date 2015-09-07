@@ -22,6 +22,7 @@
 
 #include "Token.h"
 #include "symbol_table.h"
+#include "reserved_words.h"
 
 #ifndef NULL
 #define NULL   ((void *) 0)
@@ -32,11 +33,10 @@
 char buffer[LINE_MAX];
 FILE *inputFile, *outputFile, *tokenFile;
 
-int line_number=1;
-
+int line_number = 1;
 int b = 0, f = 0;
 
-void openFiles(char *inputFileName) {
+void open_files(char *inputFileName) {
 	char outputFileName[strlen(inputFileName)+6];
 	strcpy(outputFileName, inputFileName);
 	strcat(outputFileName, ".lexan");
@@ -50,9 +50,9 @@ void openFiles(char *inputFileName) {
 	tokenFile = fopen(tokenFileName, "w");
 }
 
-char* loadLine(char *inputFileName) {
+char* load_line(char *inputFileName) {
 	if(inputFile==NULL && inputFileName!=NULL) {
-		openFiles(inputFileName);
+		open_files(inputFileName);
 	}
 	if(inputFile == NULL || outputFile == NULL) {
 		fprintf(stderr, "Can't open input or output file");
@@ -81,11 +81,12 @@ Token *run_next_machine() {
 }
 
 
-void processFile(char *inputFileName) {
+void process_file(char *inputFileName) {
+	init_reserved_words();
 	init_symbol_table();
 
-	while(loadLine(inputFileName) != NULL) {
-		fprintf(outputFile, "%d\t%s", line_number, buffer);
+	while(load_line(inputFileName) != NULL) {
+		fprintf(outputFile, "%d\t\t%s", line_number, buffer);
 
 		f = 0;
 		b = 0;
@@ -103,11 +104,9 @@ void processFile(char *inputFileName) {
 			memcpy(lexeme, &buffer[b], length);
 			lexeme[length] = '\0';
 
-			b = f; // advance b
-
 			if(result -> token == TOK_LEXERR) {
 				//TODO: print helpful error message
-				fprintf(outputFile, "LEXERR:\t%s\t%d\n", lexeme, result -> attribute);
+				fprintf(outputFile, "LEXERR:\t%s (lexerr #%d)\n", lexeme, result -> attribute);
 			}
 
 			if(result -> token != TOK_WS) {
@@ -120,6 +119,9 @@ void processFile(char *inputFileName) {
 				}
 
 			}
+
+			b = f; // advance b
+
 		}
 
 		line_number++;
@@ -147,7 +149,7 @@ void move_f_back() {
 }
 
 int main(void) {
-	processFile("example.txt");
+	process_file("example.txt");
 	puts("Done");
 	return 0;
 }
