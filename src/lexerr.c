@@ -27,7 +27,7 @@ LexerrNode *lexerr_node_new(int err_n, char* err_t, LexerrNode *nex) {
 
 LexerrNode *head_lexerr;
 
-char *get_err_text(int err_n) {
+char *get_lexerr_text(int err_n) {
 	LexerrNode *cur = head_lexerr;
 	while(cur->next!=NULL) {
 		if(err_n==cur->err_no) {

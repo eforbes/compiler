@@ -18,7 +18,7 @@ typedef struct LexerrNode LexerrNode;
 
 LexerrNode *lexerr_node_new(int err_n, char* err_t, LexerrNode *nex);
 
-char *get_err_text(int err_n);
+char *get_lexerr_text(int err_n);
 void init_lexerr();
 
 #endif /* LEXERR_H_ */

@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "machines/ws.h"
 #include "machines/id.h"
 #include "machines/long_real.h"
 #include "machines/real.h"
@@ -22,7 +23,6 @@
 #include "symbol_table.h"
 #include "reserved_words.h"
 #include "lexerr.h"
-#include "machines/ws.h"
 #include "token.h"
 
 #ifndef NULL
@@ -107,19 +107,16 @@ void process_file(char *inputFileName) {
 			lexeme[length] = '\0';
 
 			if(result -> token == TOK_LEXERR) {
-				char *err_text = get_err_text(result ->attribute);
+				char *err_text = get_lexerr_text(result ->attribute);
 				fprintf(outputFile, "LEXERR:\t%s: %s (lexerr #%d)\n", err_text, lexeme, result -> attribute);
 			}
 
 			if(result -> token != TOK_WS) {
 				if(result ->token != TOK_ID) {
-					printf("%s (%d, %d)\n", lexeme, result->token, result->attribute);
 					fprintf(tokenFile, "%d\t%s\t%d\t%d\n", line_number, lexeme, result->token, result->attribute);
 				} else {
-					printf("%s (%d, %p)\n", lexeme, result->token, result->mem);
 					fprintf(tokenFile, "%d\t%s\t%d\t%p\n", line_number, lexeme, result->token, result->mem);
 				}
-
 			}
 
 			b = f; // advance b
@@ -136,7 +133,7 @@ void process_file(char *inputFileName) {
 
 char *get_lexeme() {
 	int length = f - b;
-	char *lexeme = (char*) malloc((length+1)*sizeof(char));
+	char *lexeme = (char*) malloc((length + 1) * sizeof(char));
 	memcpy(lexeme, &buffer[b], length);
 	lexeme[length] = '\0';
 	return lexeme;
