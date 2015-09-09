@@ -1,9 +1,3 @@
-/*
- * reserved_words.h
- *
- *  Created on: Sep 7, 2015
- *      Author: Evan
- */
 
 #ifndef RESERVED_WORDS_H_
 #define RESERVED_WORDS_H_
@@ -19,7 +13,7 @@ struct ReservedWordNode {
 
 typedef struct ReservedWordNode ReservedWordNode;
 
-ReservedWordNode *reserved_word_node_new(char* sym, int t, int a, ReservedWordNode *next);
+ReservedWordNode *reserved_word_node_new(char *sym, int t, int a, ReservedWordNode *next);
 
 void init_reserved_words();
 Token *get_reserved_token(char *sym);

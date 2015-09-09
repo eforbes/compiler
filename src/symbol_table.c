@@ -1,9 +1,3 @@
-/*
- * symbol_table.c
- *
- *  Created on: Sep 5, 2015
- *      Author: Evan
- */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,26 +9,26 @@
 #define NULL   ((void *) 0)
 #endif
 
-SymbolTableNode *symbol_table_node_new(char* sym, SymbolTableNode *nex) {
+SymbolTableNode *head;
+
+SymbolTableNode *symbol_table_node_new(char *sym, SymbolTableNode *nex) {
 	SymbolTableNode *n = malloc(sizeof(SymbolTableNode));
-    n->symbol = sym;
-    n->next = nex;
+    n -> symbol = sym;
+    n -> next = nex;
     return n;
 }
 
-SymbolTableNode *head;
-
 void *get_or_add_symbol(char *sym) {
 	SymbolTableNode *cur = head;
-	while(cur->next!=NULL) {
-		if(strcmp(cur->symbol, sym)==0) {
-			return cur->symbol;
+	while(cur -> next != NULL) {
+		if(strcmp(cur -> symbol, sym) == 0) {
+			return cur -> symbol;
 		}
-		cur = cur->next;
+		cur = cur -> next;
 	}
 
 	int l = strlen(sym);
-	char *new_sym = (char*) malloc((l+1)*sizeof(char));
+	char *new_sym = (char*) malloc((l + 1) * sizeof(char));
 	memcpy(new_sym, sym, l);
 	new_sym[l] = '\0';
 
@@ -42,8 +36,7 @@ void *get_or_add_symbol(char *sym) {
 	head = new;
 	return new_sym;
 }
+
 void init_symbol_table() {
-	char *null_s = malloc(sizeof(char[1]));
-	null_s[0] = '\0';
-	head = symbol_table_node_new(null_s, NULL);
+	head = symbol_table_node_new("", NULL);
 }

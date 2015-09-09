@@ -1,9 +1,3 @@
-/*
- * lexerr.h
- *
- *  Created on: Sep 7, 2015
- *      Author: Evan
- */
 
 #ifndef LEXERR_H_
 #define LEXERR_H_
@@ -16,7 +10,7 @@ struct LexerrNode {
 
 typedef struct LexerrNode LexerrNode;
 
-LexerrNode *lexerr_node_new(int err_n, char* err_t, LexerrNode *nex);
+LexerrNode *lexerr_node_new(int err_n, char *err_t, LexerrNode *nex);
 
 char *get_lexerr_text(int err_n);
 void init_lexerr();

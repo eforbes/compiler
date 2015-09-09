@@ -1,7 +1,8 @@
 /*
  Evan Forbes
+ Dr. Shenoi
+ CS 4013
  Fall 2015
- CS 4013, Dr. Shenoi
  */
 
 #include <stdio.h>
@@ -148,7 +149,8 @@ void move_f_back() {
 }
 
 int main(void) {
-	process_file("example2.txt");
-	puts("Done");
+	process_file("example.txt");
+
+	puts("Lexical Analysis complete");
 	return 0;
 }
