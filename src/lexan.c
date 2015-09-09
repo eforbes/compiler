@@ -38,6 +38,8 @@ FILE *inputFile, *outputFile, *tokenFile;
 int line_number = 1;
 int b = 0, f = 0; // indexes within the buffer
 
+int lexerr_count = 0;
+
 void open_files(char *inputFileName) {
 	char outputFileName[strlen(inputFileName)+6];
 	strcpy(outputFileName, inputFileName);
@@ -88,6 +90,8 @@ void process_file(char *inputFileName) {
 	init_symbol_table();
 	init_lexerr();
 
+	lexerr_count = 0;
+
 	while(load_line(inputFileName) != NULL) {
 		fprintf(outputFile, "%d\t\t%s", line_number, buffer);
 
@@ -108,6 +112,8 @@ void process_file(char *inputFileName) {
 			lexeme[length] = '\0';
 
 			if(result -> token == TOK_LEXERR) {
+				lexerr_count++;
+
 				char *err_text = get_lexerr_text(result ->attribute);
 				fprintf(outputFile, "LEXERR:\t%s: %s (lexerr #%d)\n", err_text, lexeme, result -> attribute);
 			}
@@ -130,6 +136,8 @@ void process_file(char *inputFileName) {
 	fclose(inputFile);
 	fclose(outputFile);
 	fclose(tokenFile);
+
+	printf("Lexical analysis completed for %s with %d errors\n", inputFileName, lexerr_count);
 }
 
 char *get_lexeme() {
@@ -148,9 +156,13 @@ void move_f_back() {
 	f--;
 }
 
-int main(void) {
-	process_file("example.txt");
+int main(int argc, char **argv) {
+	if(argc != 2) {
+		puts("File name required as argument");
+		return -1;
+	}
 
-	puts("Lexical Analysis complete");
+	process_file(argv[1]);
+
 	return 0;
 }

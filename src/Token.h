@@ -6,7 +6,6 @@
 #define TOK_WS 1
 #define TOK_ID 2
 #define TOK_NUM 3
-
 #define TOK_RELOP 6
 #define TOK_ASSIGNOP 7
 #define TOK_ADDOP 9
