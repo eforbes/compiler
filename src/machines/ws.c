@@ -1,10 +1,3 @@
-/*
- * Whitespace.c
- *
- *  Created on: Aug 28, 2015
- *      Author: Evan
- */
-
 
 #include <stdio.h>
 #include <stdlib.h>

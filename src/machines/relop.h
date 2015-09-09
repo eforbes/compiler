@@ -11,7 +11,6 @@
 #define RELOP_GREATER_THAN 4
 #define RELOP_GREATER_THAN_OR_EQUAL 5
 
-
 Token *run_relop();
 
 #endif /* MACHINES_RELOP_H_ */

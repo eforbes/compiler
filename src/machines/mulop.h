@@ -10,7 +10,6 @@
 #define MULOP_MOD 3
 #define MULOP_AND 4
 
-
 Token *run_mulop();
 
 #endif

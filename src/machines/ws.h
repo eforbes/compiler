@@ -1,9 +1,3 @@
-/*
- * Whitespace.h
- *
- *  Created on: Aug 29, 2015
- *      Author: Evan
- */
 
 #include "../Token.h"
 

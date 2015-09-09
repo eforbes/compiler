@@ -61,7 +61,7 @@ Token *run_long_real() {
 	}
 
 	cur = next_char();
-	if(cur=='+'||cur=='-') {
+	if(cur == '+' || cur == '-') {
 		cur = next_char();
 	}
 	if(!isdigit(cur)) {

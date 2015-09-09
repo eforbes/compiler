@@ -27,3 +27,4 @@ program
 begin
 end
 or and?
+[];():,.
