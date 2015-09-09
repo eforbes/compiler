@@ -33,36 +33,36 @@
 #define LINE_MAX 72
 
 char buffer[LINE_MAX];
-FILE *inputFile, *outputFile, *tokenFile;
+FILE *input_file, *output_file, *token_file;
 
 int line_number = 1;
 int b = 0, f = 0; // indexes within the buffer
 
 int lexerr_count = 0;
 
-void open_files(char *inputFileName) {
-	char outputFileName[strlen(inputFileName)+6];
-	strcpy(outputFileName, inputFileName);
+void open_files(char *input_file_name) {
+	char outputFileName[strlen(input_file_name)+6];
+	strcpy(outputFileName, input_file_name);
 	strcat(outputFileName, ".lexan");
 
-	char tokenFileName[strlen(inputFileName)+6];
-	strcpy(tokenFileName, inputFileName);
+	char tokenFileName[strlen(input_file_name)+6];
+	strcpy(tokenFileName, input_file_name);
 	strcat(tokenFileName, ".token");
 
-	inputFile = fopen(inputFileName, "r");
-	outputFile = fopen(outputFileName, "w");
-	tokenFile = fopen(tokenFileName, "w");
+	input_file = fopen(input_file_name, "r");
+	output_file = fopen(outputFileName, "w");
+	token_file = fopen(tokenFileName, "w");
 }
 
-char* load_line(char *inputFileName) {
-	if(inputFile==NULL && inputFileName != NULL) {
-		open_files(inputFileName);
+char* load_line(char *input_file_name) {
+	if(input_file==NULL && input_file_name != NULL) {
+		open_files(input_file_name);
 	}
-	if(inputFile == NULL || outputFile == NULL) {
+	if(input_file == NULL || output_file == NULL) {
 		fprintf(stderr, "Can't open input or output file");
 		exit(1);
 	} else {
-		return fgets(buffer, LINE_MAX, inputFile);
+		return fgets(buffer, LINE_MAX, input_file);
 	}
 }
 
@@ -85,15 +85,15 @@ Token *run_next_machine() {
 }
 
 
-void process_file(char *inputFileName) {
+void process_file(char *input_file_name) {
 	init_reserved_words();
 	init_symbol_table();
 	init_lexerr();
 
 	lexerr_count = 0;
 
-	while(load_line(inputFileName) != NULL) {
-		fprintf(outputFile, "%d\t\t%s", line_number, buffer);
+	while(load_line(input_file_name) != NULL) {
+		fprintf(output_file, "%d\t\t%s", line_number, buffer);
 
 		f = 0;
 		b = 0;
@@ -115,14 +115,14 @@ void process_file(char *inputFileName) {
 				lexerr_count++;
 
 				char *err_text = get_lexerr_text(result ->attribute);
-				fprintf(outputFile, "LEXERR:\t%s: %s (lexerr #%d)\n", err_text, lexeme, result -> attribute);
+				fprintf(output_file, "LEXERR:\t%s: %s (lexerr #%d)\n", err_text, lexeme, result -> attribute);
 			}
 
 			if(result -> token != TOK_WS) {
 				if(result ->token != TOK_ID) {
-					fprintf(tokenFile, "%d\t%s\t%d\t%d\n", line_number, lexeme, result->token, result->attribute);
+					fprintf(token_file, "%d\t%s\t%d\t%d\n", line_number, lexeme, result->token, result->attribute);
 				} else {
-					fprintf(tokenFile, "%d\t%s\t%d\t%p\n", line_number, lexeme, result->token, result->mem);
+					fprintf(token_file, "%d\t%s\t%d\t%p\n", line_number, lexeme, result->token, result->mem);
 				}
 			}
 
@@ -133,11 +133,11 @@ void process_file(char *inputFileName) {
 		line_number++;
 	}
 
-	fclose(inputFile);
-	fclose(outputFile);
-	fclose(tokenFile);
+	fclose(input_file);
+	fclose(output_file);
+	fclose(token_file);
 
-	printf("Lexical analysis completed for %s with %d errors\n", inputFileName, lexerr_count);
+	printf("Lexical analysis completed for %s with %d errors\n", input_file_name, lexerr_count);
 }
 
 char *get_lexeme() {
