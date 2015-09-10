@@ -12,7 +12,10 @@
 
 #define NUMBER_OF_RESERVED_WORDS 20
 
-ReservedWordNode *reserved_word_node_new(char *sym, int t, int a, ReservedWordNode *nex) {
+ReservedWordNode *reserved_word_node_new(char *sym,
+		int t,
+		int a,
+		ReservedWordNode *nex) {
 	ReservedWordNode *n = malloc(sizeof(ReservedWordNode));
     n -> word = sym;
     n -> token = t;

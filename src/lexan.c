@@ -133,7 +133,8 @@ void process_file(char *input_file_name) {
 				} else {
 					fprintf(token_file,
 							"%d\t%s\t%d\t%p\n",
-							line_number, lexeme,
+							line_number,
+							lexeme,
 							result->token,
 							result->mem);
 				}
