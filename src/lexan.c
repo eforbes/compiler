@@ -33,12 +33,9 @@
 #define LINE_MAX 72
 
 char buffer[LINE_MAX];
-FILE *input_file, *output_file, *token_file;
-
-int line_number = 1;
 int b = 0, f = 0; // indexes within the buffer
 
-int lexerr_count = 0;
+FILE *input_file, *output_file, *token_file;
 
 void open_files(char *input_file_name) {
 	char outputFileName[strlen(input_file_name)+6];
@@ -84,13 +81,20 @@ Token *run_next_machine() {
 	}
 }
 
+char *get_lexeme() {
+	int length = f - b;
+	char *lexeme = (char*) malloc((length + 1) * sizeof(char));
+	memcpy(lexeme, &buffer[b], length);
+	lexeme[length] = '\0';
+	return lexeme;
+}
 
 void process_file(char *input_file_name) {
 	init_reserved_words();
-	init_symbol_table();
 	init_lexerr();
 
-	lexerr_count = 0;
+	int lexerr_count = 0;
+	int line_number = 1;
 
 	while(load_line(input_file_name) != NULL) {
 		fprintf(output_file, "%d\t\t%s", line_number, buffer);
@@ -106,23 +110,32 @@ void process_file(char *input_file_name) {
 				result = run_next_machine();
 			}
 
-			int length = f - b;
-			char lexeme[length + 1];
-			memcpy(lexeme, &buffer[b], length);
-			lexeme[length] = '\0';
+			char *lexeme = get_lexeme();
 
 			if(result -> token == TOK_LEXERR) {
 				lexerr_count++;
 
 				char *err_text = get_lexerr_text(result ->attribute);
-				fprintf(output_file, "LEXERR:\t%s: %s (lexerr #%d)\n", err_text, lexeme, result -> attribute);
+				fprintf(output_file,
+						"LEXERR:\t%s: %s (lexerr #%d)\n",
+						err_text, lexeme,
+						result -> attribute);
 			}
 
 			if(result -> token != TOK_WS) {
 				if(result ->token != TOK_ID) {
-					fprintf(token_file, "%d\t%s\t%d\t%d\n", line_number, lexeme, result->token, result->attribute);
+					fprintf(token_file,
+							"%d\t%s\t%d\t%d\n",
+							line_number,
+							lexeme,
+							result->token,
+							result->attribute);
 				} else {
-					fprintf(token_file, "%d\t%s\t%d\t%p\n", line_number, lexeme, result->token, result->mem);
+					fprintf(token_file,
+							"%d\t%s\t%d\t%p\n",
+							line_number, lexeme,
+							result->token,
+							result->mem);
 				}
 			}
 
@@ -137,15 +150,9 @@ void process_file(char *input_file_name) {
 	fclose(output_file);
 	fclose(token_file);
 
-	printf("Lexical analysis completed for %s with %d errors\n", input_file_name, lexerr_count);
-}
-
-char *get_lexeme() {
-	int length = f - b;
-	char *lexeme = (char*) malloc((length + 1) * sizeof(char));
-	memcpy(lexeme, &buffer[b], length);
-	lexeme[length] = '\0';
-	return lexeme;
+	printf("Lexical analysis completed for %s with %d errors\n",
+			input_file_name,
+			lexerr_count);
 }
 
 char next_char() {

@@ -12,6 +12,5 @@ typedef struct SymbolTableNode SymbolTableNode;
 SymbolTableNode *symbol_table_node_new(char *sym, SymbolTableNode *next);
 
 void *get_or_add_symbol(char *sym);
-void init_symbol_table();
 
 #endif /* SYMBOL_TABLE_H_ */

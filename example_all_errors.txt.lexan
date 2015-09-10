@@ -1,0 +1,44 @@
+1		program crazymath(argument123)!
+LEXERR:	Identifier too long: argument123 (lexerr #1)
+LEXERR:	Unrecognized symbol: ! (lexerr #99)
+2		var x, y, z: integer;
+3		function makelexerr(a: real): integer;
+4		begin
+5			x := 0123;
+LEXERR:	Integer has leading zeros: 0123 (lexerr #129)
+6			y := 12345678901
+LEXERR:	Integer too long: 12345678901 (lexerr #130)
+7			z := 01234567891
+LEXERR:	Integer has leading zeros and is too long: 01234567891 (lexerr #131)
+8			005.3
+LEXERR:	Real x part has leading zeros: 005.3 (lexerr #257)
+9			123456.5
+LEXERR:	Real x part too long: 123456.5 (lexerr #258)
+10			012345.6
+LEXERR:	Real x part has leading zeros and is too long: 012345.6 (lexerr #259)
+11			1.500
+LEXERR:	Real y part has trailing zeros: 1.500 (lexerr #260)
+12			01.10
+LEXERR:	Real x part has leading zeros, y part has trailing zeros: 01.10 (lexerr #261)
+13			123456.900
+LEXERR:	Real x part too long, y part has trailing zeros: 123456.900 (lexerr #262)
+14			0123456.100
+LEXERR:	Real x part has leading zeros and is too long, y part has trailing zeros: 0123456.100 (lexerr #263)
+15			1.123456
+LEXERR:	Real y part too long: 1.123456 (lexerr #264)
+16			01.000001
+LEXERR:	Real x part has leading zeros, y part too long: 01.000001 (lexerr #265)
+17			123456.123456
+LEXERR:	Real x part too long, y part too long: 123456.123456 (lexerr #266)
+18			012345.123456
+LEXERR:	Real x part has leading zeros and is too long, y part is too long: 012345.123456 (lexerr #267)
+19			5.123450
+LEXERR:	Real y part has trailing zeros and is too long: 5.123450 (lexerr #268)
+20			003.12345000
+LEXERR:	Real x part has leading zeros, y part has trailing zeros and is too long: 003.12345000 (lexerr #269)
+21		
+22		
+23		end;
+24		begin
+25			write(makelexerr(x, y))
+26		end.

@@ -10,6 +10,7 @@
 #endif
 
 SymbolTableNode *head;
+int symbol_table_initialized = 0;
 
 SymbolTableNode *symbol_table_node_new(char *sym, SymbolTableNode *nex) {
 	SymbolTableNode *n = malloc(sizeof(SymbolTableNode));
@@ -19,6 +20,10 @@ SymbolTableNode *symbol_table_node_new(char *sym, SymbolTableNode *nex) {
 }
 
 void *get_or_add_symbol(char *sym) {
+	if(!symbol_table_initialized) {
+		init_symbol_table();
+	}
+
 	SymbolTableNode *cur = head;
 	while(cur -> next != NULL) {
 		if(strcmp(cur -> symbol, sym) == 0) {
@@ -39,4 +44,5 @@ void *get_or_add_symbol(char *sym) {
 
 void init_symbol_table() {
 	head = symbol_table_node_new("", NULL);
+	symbol_table_initialized = 1;
 }
