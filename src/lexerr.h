@@ -2,17 +2,10 @@
 #ifndef LEXERR_H_
 #define LEXERR_H_
 
-struct LexerrNode {
-	int err_no;
-	char *err_text;
-	struct LexerrNode *next;
-};
+#define LEXERR_ID_TOO_LONG 1
+#define LEXERR_UNREC_SYMBOL 99
+#define LEXERR_FLAG_BIT_NUM 8
 
-typedef struct LexerrNode LexerrNode;
-
-LexerrNode *lexerr_node_new(int err_n, char *err_t, LexerrNode *nex);
-
-char *get_lexerr_text(int err_n);
-void init_lexerr();
+void print_lexerr_text(FILE* f, char* lexeme, int err_n);
 
 #endif /* LEXERR_H_ */

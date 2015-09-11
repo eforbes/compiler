@@ -5,6 +5,7 @@
 #include <ctype.h>
 
 #include "../lexan.h"
+#include "../lexerr.h"
 #include "../token.h"
 #include "../symbol_table.h"
 #include "../reserved_words.h"
@@ -29,7 +30,7 @@ Token *run_id() {
 	move_f_back();
 
 	if(count > ID_MAX_LENGTH) {
-		return token_new(TOK_LEXERR, 1);
+		return token_new(TOK_LEXERR, LEXERR_ID_TOO_LONG);
 	}
 
 	char *lexeme = get_lexeme();

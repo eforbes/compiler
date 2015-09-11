@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
 #include "../lexan.h"
+#include "../lexerr.h"
 #include "../token.h"
 
 #define LONG_REAL_MAX_X_LENGTH 5
@@ -94,7 +96,7 @@ Token *run_long_real() {
 	}
 
 	if(error_code > 0) {
-		Token *error_token = token_new(TOK_LEXERR, 512 + error_code);
+		Token *error_token = token_new(TOK_LEXERR, (1<<LEXERR_FLAG_BIT_NUM) | error_code);
 		return error_token;
 	}
 

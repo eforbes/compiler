@@ -5,6 +5,7 @@
 #include <ctype.h>
 
 #include "../lexan.h"
+#include "../lexerr.h"
 #include "../token.h"
 
 #define INT_MAX_LENGTH 10
@@ -44,7 +45,7 @@ Token *run_int() {
 	}
 
 	if(error_code > 0) {
-		Token *error_token = token_new(TOK_LEXERR, 128 + error_code);
+		Token *error_token = token_new(TOK_LEXERR, (1<<LEXERR_FLAG_BIT_NUM) | error_code);
 		return error_token;
 	}
 

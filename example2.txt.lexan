@@ -7,38 +7,54 @@
 7		0
 8		0.5
 9		thisistoolong
-LEXERR:	Identifier too long: thisistoolong (lexerr #1)
+LEXERR:	Identifier is too long: thisistoolong
 10		id3ntifier := 5
 11		12345678999
-LEXERR:	Integer too long: 12345678999 (lexerr #130)
+LEXERR:	Number whole part is too long: 12345678999
 12		009
-LEXERR:	Integer has leading zeros: 009 (lexerr #129)
+LEXERR:	Number whole part has leading zeros: 009
 13		000123456789
-LEXERR:	Integer has leading zeros and is too long: 000123456789 (lexerr #131)
+LEXERR:	Number whole part has leading zeros: 000123456789
+LEXERR:	Number whole part is too long: 000123456789
 14		09.5
-LEXERR:	Real x part has leading zeros: 09.5 (lexerr #257)
+LEXERR:	Number whole part has leading zeros: 09.5
 15		123456.5
-LEXERR:	Real x part too long: 123456.5 (lexerr #258)
+LEXERR:	Number whole part is too long: 123456.5
 16		0012345.7
-LEXERR:	Real x part has leading zeros and is too long: 0012345.7 (lexerr #259)
+LEXERR:	Number whole part has leading zeros: 0012345.7
+LEXERR:	Number whole part is too long: 0012345.7
 17		123456.0
-LEXERR:	Real x part too long: 123456.0 (lexerr #258)
+LEXERR:	Number whole part is too long: 123456.0
 18		123456.900
-LEXERR:	Real x part too long, y part has trailing zeros: 123456.900 (lexerr #262)
+LEXERR:	Number whole part is too long: 123456.900
+LEXERR:	Number fractional part has trailing zeros: 123456.900
 19		07.70
-LEXERR:	Real x part has leading zeros, y part has trailing zeros: 07.70 (lexerr #261)
+LEXERR:	Number whole part has leading zeros: 07.70
+LEXERR:	Number fractional part has trailing zeros: 07.70
 20		897.123456
-LEXERR:	Real y part too long: 897.123456 (lexerr #264)
+LEXERR:	Number fractional part is too long: 897.123456
 21		0012345.0012345
-LEXERR:	Real x part has leading zeros and is too long, y part is too long: 0012345.0012345 (lexerr #267)
+LEXERR:	Number whole part has leading zeros: 0012345.0012345
+LEXERR:	Number whole part is too long: 0012345.0012345
+LEXERR:	Number fractional part is too long: 0012345.0012345
 22		1.2E+3
 23		1.2E3
 24		12345.12345E-99
 25		123456.123456E123
-LEXERR:	LongReal x part too long, y part too long, z part too long: 123456.123456E123 (lexerr #538)
+LEXERR:	Number whole part is too long: 123456.123456E123
+LEXERR:	Number fractional part is too long: 123456.123456E123
+LEXERR:	Number exponent part is too long: 123456.123456E123
 26		program
 27		begin
 28		end
 29		or and?
-LEXERR:	Unrecognized symbol: ? (lexerr #99)
+LEXERR:	Unrecognized symbol: ?
 30		[];():,.
+31		allerrorsonone 0123456.1234560E+123 line!
+LEXERR:	Identifier is too long: allerrorsonone
+LEXERR:	Number whole part has leading zeros: 0123456.1234560E+123
+LEXERR:	Number whole part is too long: 0123456.1234560E+123
+LEXERR:	Number fractional part has trailing zeros: 0123456.1234560E+123
+LEXERR:	Number fractional part is too long: 0123456.1234560E+123
+LEXERR:	Number exponent part is too long: 0123456.1234560E+123
+LEXERR:	Unrecognized symbol: !

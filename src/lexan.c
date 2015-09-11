@@ -91,7 +91,6 @@ char *get_lexeme() {
 
 void process_file(char *input_file_name) {
 	init_reserved_words();
-	init_lexerr();
 
 	int lexerr_count = 0;
 	int line_number = 1;
@@ -115,11 +114,7 @@ void process_file(char *input_file_name) {
 			if(result -> token == TOK_LEXERR) {
 				lexerr_count++;
 
-				char *err_text = get_lexerr_text(result ->attribute);
-				fprintf(output_file,
-						"LEXERR:\t%s: %s (lexerr #%d)\n",
-						err_text, lexeme,
-						result -> attribute);
+				print_lexerr_text(output_file, lexeme, result -> attribute);
 			}
 
 			if(result -> token != TOK_WS) {
