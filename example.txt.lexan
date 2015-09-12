@@ -4,8 +4,14 @@
 4		begin
 5			if b = 0 then gcd := a
 6			else gcd := gcd(b, a mod b)
-7		end;
-8		begin
-9			read(x, y);
-10			write(gcd(x, y))
-11		end.
+7		
+8			3.4E+
+9			3.E4+
+10			3E4+
+11			3.E
+12		
+13		end;
+14		begin
+15			read(x, y);
+16			write(gcd(x, y))
+17		end.

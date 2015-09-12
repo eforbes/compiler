@@ -142,6 +142,14 @@ void process_file(char *input_file_name) {
 		line_number++;
 	}
 
+	Token *eof_token = token_new(TOK_EOF, 0);
+	fprintf(token_file,
+		"%d\t%s\t%d\t%d\n",
+		line_number,
+		"EOF",
+		eof_token->token,
+		eof_token->attribute);
+
 	fclose(input_file);
 	fclose(output_file);
 	fclose(token_file);

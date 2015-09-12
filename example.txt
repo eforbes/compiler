@@ -4,6 +4,12 @@ function gcd(a, b: integer): integer;
 begin
 	if b = 0 then gcd := a
 	else gcd := gcd(b, a mod b)
+
+	3.4E+
+	3.E4+
+	3E4+
+	3.E
+
 end;
 begin
 	read(x, y);

@@ -18,6 +18,7 @@
 #define TOK_COLON 16
 #define TOK_SQUARE_BRACKET_OPEN 17
 #define TOK_SQUARE_BRACKET_CLOSE 18
+#define TOK_EOF 19
 
 #define TOK_LEXERR 99
 
