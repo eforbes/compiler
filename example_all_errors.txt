@@ -7,7 +7,6 @@ begin
 	z := 01234567891
 	
 	a := 0012345.1234500E+123
-
 end;
 begin
 	write(makelexerr(x, y))

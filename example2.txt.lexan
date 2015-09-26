@@ -58,3 +58,5 @@ LEXERR:	Number fractional part has trailing zeros: 0123456.1234560E+123
 LEXERR:	Number fractional part is too long: 0123456.1234560E+123
 LEXERR:	Number exponent part is too long: 0123456.1234560E+123
 LEXERR:	Unrecognized symbol: !
+32		
+33		3..4.

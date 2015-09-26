@@ -18,8 +18,7 @@ LEXERR:	Number whole part is too long: 0012345.1234500E+123
 LEXERR:	Number fractional part has trailing zeros: 0012345.1234500E+123
 LEXERR:	Number fractional part is too long: 0012345.1234500E+123
 LEXERR:	Number exponent part is too long: 0012345.1234500E+123
-10		
-11		end;
-12		begin
-13			write(makelexerr(x, y))
-14		end.
+10		end;
+11		begin
+12			write(makelexerr(x, y))
+13		end.

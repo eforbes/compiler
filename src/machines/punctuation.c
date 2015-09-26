@@ -11,7 +11,13 @@ Token *run_punctuation() {
 
 	switch(cur){
 	case '.':
-		return token_new(TOK_PERIOD, 0);
+		cur = next_char();
+		if(cur == '.') {
+			return token_new(TOK_DOT_DOT, 0);
+		} else {
+			move_f_back();
+			return token_new(TOK_PERIOD, 0);
+		}
 	case ';':
 		return token_new(TOK_SEMICOLON, 0);
 	case ',':

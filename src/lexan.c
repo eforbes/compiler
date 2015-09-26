@@ -89,74 +89,89 @@ char *get_lexeme() {
 	return lexeme;
 }
 
-void process_file(char *input_file_name) {
-	init_reserved_words();
+int first_call = 1;
+char* input_file_name;
+int line_number = 1, lexerr_count = 0;
 
-	int lexerr_count = 0;
-	int line_number = 1;
+Token *get_token() {
+	if(first_call) {
+		init_reserved_words();
 
-	while(load_line(input_file_name) != NULL) {
+		load_line(input_file_name);
+
+		fprintf(output_file, "%d\t\t%s", line_number, buffer);
+
+		first_call = 0;
+	}
+
+	if(feof(input_file)) {
+		fprintf(token_file,
+					"%d\t%s\t%d\t%d\n",
+					line_number,
+					"EOF",
+					TOK_EOF,
+					0);
+
+		fclose(input_file);
+		fclose(output_file);
+		fclose(token_file);
+
+		return token_new(TOK_EOF, 0);
+	}
+
+	while(buffer[f] == '\n') {
+		load_line(input_file_name);
+		line_number++;
+
+		if(feof(input_file)) {
+			return get_token();
+		}
+
 		fprintf(output_file, "%d\t\t%s", line_number, buffer);
 
 		f = 0;
 		b = 0;
-		while(buffer[f] != '\n') {
-			current_machine = 0;
-			Token *result = run_next_machine();
-			while(result -> token == TOK_BLOCKED) {
-				f = b; // reset f
-				current_machine++; // move to next machine
-				result = run_next_machine();
-			}
-
-			char *lexeme = get_lexeme();
-
-			if(result -> token == TOK_LEXERR) {
-				lexerr_count++;
-
-				print_lexerr_text(output_file, lexeme, result -> attribute);
-			}
-
-			if(result -> token != TOK_WS) {
-				if(result ->token != TOK_ID) {
-					fprintf(token_file,
-							"%d\t%s\t%d\t%d\n",
-							line_number,
-							lexeme,
-							result->token,
-							result->attribute);
-				} else {
-					fprintf(token_file,
-							"%d\t%s\t%d\t%p\n",
-							line_number,
-							lexeme,
-							result->token,
-							result->mem);
-				}
-			}
-
-			b = f; // advance b
-
-		}
-
-		line_number++;
 	}
 
-	Token *eof_token = token_new(TOK_EOF, 0);
-	fprintf(token_file,
-		"%d\t%s\t%d\t%d\n",
-		line_number,
-		"EOF",
-		eof_token->token,
-		eof_token->attribute);
+	current_machine = 0;
+	Token *result = run_next_machine();
+	while(result -> token == TOK_BLOCKED) {
+		f = b; // reset f
+		current_machine++; // move to next machine
+		result = run_next_machine();
+	}
 
-	fclose(input_file);
-	fclose(output_file);
-	fclose(token_file);
+	char *lexeme = get_lexeme();
 
-	printf("Lexical analysis completed for %s with %d errors\n",
-			input_file_name,
-			lexerr_count);
+	if(result -> token == TOK_LEXERR) {
+		lexerr_count++;
+
+		print_lexerr_text(output_file, lexeme, result -> attribute);
+	}
+
+	b = f; // advance b
+
+	if(result -> token != TOK_WS) {
+		if(result -> token != TOK_ID) {
+			fprintf(token_file,
+					"%d\t%s\t%d\t%d\n",
+					line_number,
+					lexeme,
+					result->token,
+					result->attribute);
+		} else {
+			fprintf(token_file,
+					"%d\t%s\t%d\t%p\n",
+					line_number,
+					lexeme,
+					result->token,
+					result->mem);
+		}
+		return result;
+	} else {
+		return get_token();
+	}
+
 }
 
 char next_char() {
@@ -167,13 +182,20 @@ void move_f_back() {
 	f--;
 }
 
-int main(int argc, char **argv) {
-	if(argc != 2) {
-		puts("File name required as argument");
-		return -1;
-	}
-
-	process_file(argv[1]);
-
-	return 0;
-}
+//For testing lexan
+//int main(int argc, char **argv) {
+//	if(argc != 2) {
+//		puts("File name required as argument");
+//		return -1;
+//	}
+//
+//	input_file_name = argv[1];
+//
+//	while(get_token()->token != TOK_EOF){}
+//
+//	printf("Lexical analysis completed for %s with %d errors\n",
+//			input_file_name,
+//			lexerr_count);
+//
+//	return 0;
+//}

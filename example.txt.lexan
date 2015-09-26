@@ -1,17 +1,4 @@
 1		program example(input, output);
-2		var x, y: integer;
-3		function gcd(a, b: integer): integer;
-4		begin
-5			if b = 0 then gcd := a
-6			else gcd := gcd(b, a mod b)
-7		
-8			3.4E+
-9			3.E4+
-10			3E4+
-11			3.E
-12		
-13		end;
-14		begin
-15			read(x, y);
-16			write(gcd(x, y))
-17		end.
+SYNERR:	Expected ) received an identifier
+SYNERR:	Expected ; received ,
+SYNERR:	Expected end of file received an identifier

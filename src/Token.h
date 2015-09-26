@@ -19,6 +19,7 @@
 #define TOK_SQUARE_BRACKET_OPEN 17
 #define TOK_SQUARE_BRACKET_CLOSE 18
 #define TOK_EOF 19
+#define TOK_DOT_DOT 20
 
 #define TOK_LEXERR 99
 
@@ -27,7 +28,6 @@
 #define TOK_ARRAY 1002
 #define TOK_OF 1003
 #define TOK_FUNCTION 1004
-#define TOK_PROCEDURE 1005
 #define TOK_BEGIN 1006
 #define TOK_END 1007
 #define TOK_IF 1008
