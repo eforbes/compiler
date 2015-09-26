@@ -91,7 +91,7 @@ char *get_lexeme() {
 
 int first_call = 1;
 char* input_file_name;
-int line_number = 1, lexerr_count = 0;
+int line_number = 1, lexerr_count = 0, first_eof=1;
 
 Token *get_token() {
 	if(first_call) {
@@ -105,16 +105,20 @@ Token *get_token() {
 	}
 
 	if(feof(input_file)) {
-		fprintf(token_file,
-					"%d\t%s\t%d\t%d\n",
-					line_number,
-					"EOF",
-					TOK_EOF,
-					0);
+		if(first_eof){
+			fprintf(token_file,
+						"%d\t%s\t%d\t%d\n",
+						line_number,
+						"EOF",
+						TOK_EOF,
+						0);
 
-		fclose(input_file);
-		fclose(output_file);
-		fclose(token_file);
+			fclose(input_file);
+			fclose(output_file);
+			fclose(token_file);
+
+			first_eof = 0;
+		}
 
 		return token_new(TOK_EOF, 0);
 	}

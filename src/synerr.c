@@ -20,7 +20,7 @@ char *get_token_desc(int token_id) {
 	switch(token_id) {
 	case TOK_ADDOP: sprintf(desc, "an addop"); break;
 	case TOK_ARRAY: sprintf(desc, "array"); break;
-	case TOK_ASSIGNOP: sprintf(desc, "an assignop"); break;
+	case TOK_ASSIGNOP: sprintf(desc, ":="); break;
 	case TOK_BEGIN: sprintf(desc, "begin"); break;
 	case TOK_COLON: sprintf(desc, ":"); break;
 	case TOK_COMMA: sprintf(desc, ","); break;

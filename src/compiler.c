@@ -11,6 +11,7 @@ Token *tok;
 char err_buffer[ERR_BUFFER_SIZE];
 
 void match(int t) {
+	printf("Matching %s\n", get_token_desc(t));
 	if(tok->token == t) {
 		if(t != TOK_EOF) {
 			tok = get_token();
@@ -19,14 +20,20 @@ void match(int t) {
 		}
 	} else {
 		//SYNERR
-		sprintf(err_buffer, "Expected %s received %s", get_token_desc(t), get_token_desc(tok->token));
+		sprintf(err_buffer,
+				"Expected {%s}; received {%s}",
+				get_token_desc(t),
+				get_token_desc(tok->token));
 		synerr(err_buffer);
+
 		tok = get_token();
+
 	}
 }
 
 void parse() {
 	tok = get_token();
+	printf("first token: %s\n", get_token_desc(tok->token));
 	p_prog();
 	match(TOK_EOF);
 }
