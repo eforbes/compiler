@@ -104,7 +104,7 @@ Token *get_token() {
 		first_call = 0;
 	}
 
-	if(feof(input_file)) {
+	if(feof(input_file) || first_eof == 0) {
 		if(first_eof){
 			fprintf(token_file,
 						"%d\t%s\t%d\t%d\n",
@@ -132,6 +132,7 @@ Token *get_token() {
 		}
 
 		fprintf(output_file, "%d\t\t%s", line_number, buffer);
+		printf("====line %d====\n", line_number);
 
 		f = 0;
 		b = 0;

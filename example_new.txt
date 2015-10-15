@@ -1,0 +1,5 @@
+program example(a);
+function e2:integer; 
+begin end;
+begin
+end.

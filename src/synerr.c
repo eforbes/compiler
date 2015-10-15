@@ -54,8 +54,15 @@ char *get_token_desc(int token_id) {
 	return desc;
 }
 
-void synch() {
-	while(tok->token!=TOK_EOF) {
-		tok = get_token();
+void synch(int *synch_tokens, int size) {
+	int i;
+	int found = 0;
+	while( !found ) {
+		for(i = 0; i < size; i++) {
+			if(tok->token == synch_tokens[i])
+				found = 1;
+		}
+		if(!found)
+			tok = get_token();
 	}
 }

@@ -10,6 +10,6 @@
 
 void synerr(char *message);
 char *get_token_desc(int token_id);
-void synch();
+void synch(int *synch_tokens, int size);
 
 #endif /* SYNERR_H_ */

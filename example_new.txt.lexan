@@ -1,0 +1,5 @@
+1		program example(a);
+2		function e2:integer; 
+3		begin end;
+4		begin
+5		end.

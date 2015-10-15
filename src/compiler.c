@@ -33,7 +33,6 @@ void match(int t) {
 
 void parse() {
 	tok = get_token();
-	printf("first token: %s\n", get_token_desc(tok->token));
 	p_prog();
 	match(TOK_EOF);
 }
