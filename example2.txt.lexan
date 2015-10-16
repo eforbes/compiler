@@ -1,4 +1,5 @@
 1		<= >= > <> < =
+SYNERR:	Expecting {program}; received {a relop}
 2				a + b - c
 3		a * b/c
 4		p:=507
@@ -45,18 +46,5 @@ LEXERR:	Number whole part is too long: 123456.123456E123
 LEXERR:	Number fractional part is too long: 123456.123456E123
 LEXERR:	Number exponent part is too long: 123456.123456E123
 26		program
+SYNERR:	Expected {end of file}; received {program}
 27		begin
-28		end
-29		or and?
-LEXERR:	Unrecognized symbol: ?
-30		[];():,.
-31		allerrorsonone 0123456.1234560E+123 line!
-LEXERR:	Identifier is too long: allerrorsonone
-LEXERR:	Number whole part has leading zeros: 0123456.1234560E+123
-LEXERR:	Number whole part is too long: 0123456.1234560E+123
-LEXERR:	Number fractional part has trailing zeros: 0123456.1234560E+123
-LEXERR:	Number fractional part is too long: 0123456.1234560E+123
-LEXERR:	Number exponent part is too long: 0123456.1234560E+123
-LEXERR:	Unrecognized symbol: !
-32		
-33		3..4.

@@ -30,7 +30,7 @@ void p_prog() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_PROGRAM};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -59,7 +59,7 @@ void p_prog_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_VAR, TOK_FUNCTION, TOK_BEGIN};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -82,7 +82,7 @@ void p_prog_tt() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_FUNCTION, TOK_BEGIN};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -100,7 +100,7 @@ void p_idlst() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -123,7 +123,7 @@ void p_idlst_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -145,7 +145,7 @@ void p_decls() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_VAR, TOK_FUNCTION, TOK_BEGIN};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -173,7 +173,7 @@ void p_decls_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_VAR, TOK_FUNCTION, TOK_BEGIN};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -203,7 +203,7 @@ void p_type() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_INTEGER, TOK_REAL, TOK_ARRAY, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -224,7 +224,7 @@ void p_stdtype() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_INTEGER, TOK_REAL, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -243,7 +243,7 @@ void p_subprogdecls() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_FUNCTION, TOK_ID, TOK_BEGIN, TOK_IF, TOK_WHILE, TOK_END};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -274,7 +274,7 @@ void p_subprogdecls_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_FUNCTION, TOK_ID, TOK_BEGIN, TOK_IF, TOK_WHILE, TOK_END};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -292,7 +292,7 @@ void p_subprogdecl() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_FUNCTION};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -319,7 +319,7 @@ void p_subprogdecl_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_VAR, TOK_FUNCTION, TOK_BEGIN};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -341,7 +341,7 @@ void p_subprogdecl_tt() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_FUNCTION, TOK_BEGIN};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -360,7 +360,7 @@ void p_subproghead() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_FUNCTION, TOK_BEGIN, TOK_VAR};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -386,7 +386,7 @@ void p_subproghead_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_PARENS_OPEN, TOK_COLON, TOK_FUNCTION, TOK_BEGIN, TOK_VAR};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -405,7 +405,7 @@ void p_args() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_PARENS_OPEN, TOK_COLON};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -425,7 +425,7 @@ void p_paramlst() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -450,7 +450,7 @@ void p_paramlst_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -468,7 +468,7 @@ void p_cmpndstmt() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_BEGIN, TOK_PERIOD, TOK_END, TOK_ELSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -496,7 +496,7 @@ void p_cmpndstmt_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_BEGIN, TOK_IF, TOK_WHILE, TOK_END, TOK_PERIOD, TOK_ELSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -519,7 +519,7 @@ void p_optstmts() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_BEGIN, TOK_IF, TOK_WHILE, TOK_END};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -543,7 +543,7 @@ void p_stmtlst() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_BEGIN, TOK_IF, TOK_WHILE, TOK_END};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -566,7 +566,7 @@ void p_stmtlst_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_END};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -604,7 +604,7 @@ void p_stmt() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_BEGIN, TOK_IF, TOK_WHILE, TOK_END, TOK_ELSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -628,7 +628,7 @@ void p_stmt_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ELSE, TOK_END};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -646,7 +646,7 @@ void p_variable() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_ASSIGNOP};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -669,7 +669,7 @@ void p_variable_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_SQUARE_BRACKET_OPEN, TOK_ASSIGNOP};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -701,7 +701,7 @@ void p_exprlst() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_NUM, TOK_PARENS_OPEN, TOK_NOT, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -724,7 +724,7 @@ void p_exprlst_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -756,7 +756,7 @@ void p_expr() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_NUM, TOK_PARENS_OPEN, TOK_NOT, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -792,7 +792,7 @@ void p_expr_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -825,7 +825,7 @@ void p_smplexpr() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_NUM, TOK_PARENS_OPEN, TOK_NOT, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -864,7 +864,7 @@ void p_smplexpr_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ADDOP, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -888,7 +888,7 @@ void p_term() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_NUM, TOK_PARENS_OPEN, TOK_NOT, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -929,7 +929,7 @@ void p_term_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_MULOP, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -962,7 +962,7 @@ void p_factor() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_NUM, TOK_PARENS_OPEN, TOK_NOT, TOK_MULOP, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -1011,7 +1011,7 @@ void p_factor_t() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_PARENS_OPEN, TOK_SQUARE_BRACKET_OPEN, TOK_MULOP, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
@@ -1031,7 +1031,7 @@ void p_sign() {
 				get_token_desc(tok->token));
 		synerr(synerr_buffer);
 
-		int array[] = {TOK_SEMICOLON, TOK_EOF};
+		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_NUM, TOK_PARENS_OPEN, TOK_NOT};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
 }
