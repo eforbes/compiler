@@ -1,0 +1,11 @@
+program example(input, output);
+var x: integer; 
+var verylongvariable: integer;
+function gcd(a: integer; b: integer): int;
+	begin
+		if b = 0 then gcd := a
+		else gcd := gcd(b, a mod b)
+	end;
+begin
+	result := gcd(x, y)
+end.

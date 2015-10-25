@@ -1,0 +1,14 @@
+1		program example(input, output);
+2		var x: integer; 
+3		var verylongvariable: integer;
+LEXERR:	Identifier is too long: verylongvariable
+SYNERR:	Expected {an identifier}; received {a lexerr}
+4		function gcd(a: integer; b: integer): int;
+SYNERR:	Expecting one of {integer}, {real}; received {an identifier}
+5			begin
+6				if b = 0 then gcd := a
+7				else gcd := gcd(b, a mod b)
+8			end;
+9		begin
+10			result := gcd(x, y)
+11		end.

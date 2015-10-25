@@ -11,7 +11,6 @@
 
 void synerr(char *message) {
 	fprintf(output_file, "SYNERR:\t%s\n", message);
-	printf("SYNERR:\t%s\n", message);
 }
 
 char *get_token_desc(int token_id) {
@@ -49,6 +48,7 @@ char *get_token_desc(int token_id) {
 	case TOK_THEN: sprintf(desc, "then"); break;
 	case TOK_VAR: sprintf(desc, "var"); break;
 	case TOK_WHILE: sprintf(desc, "while"); break;
+	case TOK_LEXERR: sprintf(desc, "a lexerr"); break;
 	default: sprintf(desc, "uknown"); break;
 	}
 	return desc;

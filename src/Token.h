@@ -41,7 +41,6 @@
 
 #define NUM_INT 0
 #define NUM_REAL 1
-#define NUM_LONG_REAL 2
 
 typedef struct Token {
 	int token;

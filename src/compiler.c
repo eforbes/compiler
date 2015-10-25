@@ -1,4 +1,9 @@
-
+/**
+ * Evan Forbes
+ * Dr. Shenoi
+ * Compilers
+ * Fall 2015
+ */
 #include "lexan.h"
 #include "token.h"
 #include "parsers.h"
@@ -11,7 +16,6 @@ Token *tok;
 char err_buffer[ERR_BUFFER_SIZE];
 
 void match(int t) {
-	printf("Matching %s\n", get_token_desc(t));
 	if(tok->token == t) {
 		if(t != TOK_EOF) {
 			tok = get_token();

@@ -101,7 +101,7 @@ Token *run_long_real() {
 		return error_token;
 	}
 
-	Token *result_token = token_new(TOK_NUM, NUM_LONG_REAL);
+	Token *result_token = token_new(TOK_NUM, NUM_REAL);
 	return result_token;
 }
 

@@ -1,24 +1,13 @@
 1		program crazymath(argument123)!
 LEXERR:	Identifier is too long: argument123
+SYNERR:	Expecting {an identifier}; received {a lexerr}
 LEXERR:	Unrecognized symbol: !
+SYNERR:	Expected {;}; received {a lexerr}
 2		var x, y, z: integer;
+SYNERR:	Expected {:}; received {,}
+SYNERR:	Expecting one of {integer}, {real}, {array}; received {an identifier}
+SYNERR:	Expected {;}; received {integer}
+SYNERR:	Expecting one of {var}, {function}, {begin}; received {;}
+SYNERR:	Expecting {program}; received {;}
+SYNERR:	Expected {end of file}; received {;}
 3		function makelexerr(a: real): integer;
-4		begin
-5			x := 0123;
-LEXERR:	Number whole part has leading zeros: 0123
-6			y := 12345678901
-LEXERR:	Number whole part is too long: 12345678901
-7			z := 01234567891
-LEXERR:	Number whole part has leading zeros: 01234567891
-LEXERR:	Number whole part is too long: 01234567891
-8			
-9			a := 0012345.1234500E+123
-LEXERR:	Number whole part has leading zeros: 0012345.1234500E+123
-LEXERR:	Number whole part is too long: 0012345.1234500E+123
-LEXERR:	Number fractional part has trailing zeros: 0012345.1234500E+123
-LEXERR:	Number fractional part is too long: 0012345.1234500E+123
-LEXERR:	Number exponent part is too long: 0012345.1234500E+123
-10		end;
-11		begin
-12			write(makelexerr(x, y))
-13		end.

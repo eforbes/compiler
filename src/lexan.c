@@ -132,7 +132,6 @@ Token *get_token() {
 		}
 
 		fprintf(output_file, "%d\t\t%s", line_number, buffer);
-		printf("====line %d====\n", line_number);
 
 		f = 0;
 		b = 0;
