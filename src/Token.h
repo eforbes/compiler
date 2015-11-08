@@ -46,11 +46,11 @@ typedef struct Token {
 	int token;
 	union {
 		int attribute;
-		void *mem;
+		char *lex;
 	};
 } Token;
 
 Token *token_new(int token_in, int attribute_in);
-Token *token_mem_new(int token_in, void *mem_in);
+Token *token_id_new(int token_in, char *lex_in);
 
 #endif /* TOKEN_H_ */

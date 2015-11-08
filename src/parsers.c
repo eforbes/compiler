@@ -6,6 +6,7 @@
 #include "parsers.h"
 #include "compiler.h"
 #include "synerr.h"
+#include "type.h"
 #include "machines/addop.h"
 
 #define SYNERR_BUFFER_SIZE 256
@@ -571,29 +572,63 @@ void p_stmtlst_t() {
 	}
 }
 
-void p_stmt() {
+int p_stmt() {
+	int variable_type;
+	int expr_type;
+
+	int stmt_type;
+	int stmt2_type;
+
 	switch(tok->token) {
 	case TOK_ID:
-		p_variable();
+		variable_type = p_variable();
 		match(TOK_ASSIGNOP);
-		p_expr();
-		break;
+		expr_type = p_expr();
+		if(variable_type == TYPE_ERR || expr_type == TYPE_ERR) {
+			return TYPE_ERR;
+		}
+		if(variable_type == TYPE_INT && expr_type == TYPE_INT) {
+			return TYPE_OK;
+		}
+		if(variable_type == TYPE_REAL && expr_type == TYPE_REAL) {
+			return TYPE_OK;
+		}
+		//semerr
+
+		return TYPE_ERR;
 	case TOK_BEGIN:
-		p_cmpndstmt();
-		break;
+		return p_cmpndstmt();
 	case TOK_IF:
 		match(TOK_IF);
-		p_expr();
+		expr_type = p_expr();
 		match(TOK_THEN);
-		p_stmt();
-		p_stmt_t();
-		break;
+		stmt_type = p_stmt();
+		stmt2_type = p_stmt_t();
+
+		if(expr_type != TYPE_BOOL) {
+			//synerr boolean expr required
+			return TYPE_ERR;
+		}
+
+		if(stmt_type == TYPE_ERR || stmt2_type == TYPE_ERR) {
+			return TYPE_ERR;
+		}
+
+		return TYPE_OK;
 	case TOK_WHILE:
 		match(TOK_WHILE);
-		p_expr();
+		expr_type = p_expr();
 		match(TOK_DO);
-		p_stmt();
-		break;
+		stmt_type = p_stmt();
+
+		if(expr_type != TYPE_BOOL) {
+			//synerr boolean expr required
+			return TYPE_ERR;
+		}
+		if(stmt_type == TYPE_ERR) {
+			return TYPE_ERR;
+		}
+		return TYPE_OK;
 	default:
 		sprintf(synerr_buffer,
 				"Expecting one of {%s}, {%s}, {%s}, {%s}; received {%s}",
@@ -606,19 +641,20 @@ void p_stmt() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_BEGIN, TOK_IF, TOK_WHILE, TOK_END, TOK_ELSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
+
+		return TYPE_ERR;
 	}
 }
 
-void p_stmt_t() {
+int p_stmt_t() {
 	switch(tok->token) {
 	case TOK_ELSE:
 		match(TOK_ELSE);
-		p_stmt();//TODO: is this right?
-		break;
+		return p_stmt();//TODO: is this right?
 	case TOK_SEMICOLON:
 	case TOK_END:
 		// nop
-		break;
+		return TYPE_OK;
 	default:
 		sprintf(synerr_buffer,
 				"Expecting one of {%s}, {%s}, {%s}; received {%s}",
@@ -630,15 +666,31 @@ void p_stmt_t() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ELSE, TOK_END};
 		synch(array, sizeof(array)/sizeof(array[0]));
+
+		return TYPE_ERR;
 	}
 }
 
-void p_variable() {
+int p_variable() {
+	int id_type;
+	int variable_type;
+
 	switch(tok->token) {
 	case TOK_ID:
+		id_type = gettype(tok -> lex);
 		match(TOK_ID);
-		p_variable_t();
-		break;
+		variable_type = p_variable_t();
+		if(id_type == TYPE_ERR || variable_type == TYPE_ERR) {
+			return TYPE_ERR;
+		}
+		if((id_type == TYPE_INT || id_type == TYPE_REAL) && variable_type == TYPE_OK) {
+			return id_type;
+		}
+		if((id_type == TYPE_A_INT || id_type == TYPE_A_REAL) && variable_type == TYPE_INT) {
+			return array_to_type(id_type);
+		}
+		//semerr assigning to array var or using basic type as array
+		return TYPE_ERR;
 	default:
 		sprintf(synerr_buffer,
 				"Expecting {%s}; received {%s}",
@@ -648,19 +700,31 @@ void p_variable() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_ASSIGNOP};
 		synch(array, sizeof(array)/sizeof(array[0]));
+
+		return TYPE_ERR;
 	}
 }
 
-void p_variable_t() {
+int p_variable_t() {
+	int expr_type;
+
 	switch(tok->token) {
 	case TOK_SQUARE_BRACKET_OPEN:
 		match(TOK_SQUARE_BRACKET_OPEN);
-		p_expr();
+		expr_type = p_expr();
 		match(TOK_SQUARE_BRACKET_CLOSE);
-		break;
+
+		if(expr_type == TYPE_INT) {
+			return TYPE_INT;
+		}
+		if(expr_type == TYPE_ERR) {
+			return TYPE_ERR;
+		}
+		//semerr using wrong type as array index
+		return TYPE_ERR;
 	case TOK_ASSIGNOP:
 		// nop
-		break;
+		return TYPE_OK;
 	default:
 		sprintf(synerr_buffer,
 				"Expecting one of {%s}, {%s}; received {%s}",
@@ -671,6 +735,8 @@ void p_variable_t() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_SQUARE_BRACKET_OPEN, TOK_ASSIGNOP};
 		synch(array, sizeof(array)/sizeof(array[0]));
+
+		return TYPE_ERR;
 	}
 }
 
@@ -729,19 +795,43 @@ void p_exprlst_t() {
 	}
 }
 
-void p_expr() {
+int p_expr() {
+	int smplexpr_type;
+	int expr_type;
+
 	switch(tok->token) {
 	case TOK_ID:
 	case TOK_NUM:
 	case TOK_PARENS_OPEN:
 	case TOK_NOT:
-		p_smplexpr();
-		p_expr_t();
-		break;
+		smplexpr_type = p_smplexpr();
+		expr_type = p_expr_t();
+		if(expr_type == TYPE_ERR || smplexpr_type == TYPE_ERR) {
+			return TYPE_ERR;
+		}
+		if(expr_type == TYPE_OK) {
+			return smplexpr_type;
+		}
+		if(expr_type == TYPE_BOOL) {
+			return TYPE_BOOL;
+		}
+		//semerr
+		return TYPE_ERR;
 	case TOK_ADDOP:
 		if(tok->attribute==ADDOP_ADD || tok->attribute==ADDOP_SUBTRACT) {
-			p_smplexpr();
-			p_expr_t();
+			smplexpr_type = p_smplexpr();
+			expr_type = p_expr_t();
+			if(expr_type == TYPE_ERR || smplexpr_type == TYPE_ERR) {
+				return TYPE_ERR;
+			}
+			if(expr_type == TYPE_OK) {
+				return smplexpr_type;
+			}
+			if(expr_type == TYPE_BOOL) {
+				return TYPE_BOOL;
+			}
+			//semerr
+			return TYPE_ERR;
 			break;
 		}
 	default:
@@ -758,15 +848,21 @@ void p_expr() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_NUM, TOK_PARENS_OPEN, TOK_NOT, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
+		return TYPE_ERR;
 	}
 }
 
-void p_expr_t() {
+int p_expr_t() {
+	int smplexpr_type;
+
 	switch(tok->token) {
 	case TOK_RELOP:
 		match(TOK_RELOP);
-		p_smplexpr();
-		break;
+		smplexpr_type = p_smplexpr();
+		if(smplexpr_type == TYPE_ERR) {
+			return TYPE_ERR;
+		}
+		return TYPE_BOOL;
 	case TOK_SEMICOLON:
 	case TOK_END:
 	case TOK_ELSE:
@@ -776,7 +872,7 @@ void p_expr_t() {
 	case TOK_COMMA:
 	case TOK_PARENS_CLOSE:
 		// nop
-		break;
+		return TYPE_OK;
 	default:
 		sprintf(synerr_buffer,
 				"Expecting one of {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}; received {%s}",
@@ -794,24 +890,49 @@ void p_expr_t() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
+
+		return TYPE_ERR;
 	}
 }
 
-void p_smplexpr() {
+int p_smplexpr() {
+	int term_type;
+	int smplexpr_type;
+
 	switch(tok->token) {
 	case TOK_ID:
 	case TOK_NUM:
 	case TOK_PARENS_OPEN:
 	case TOK_NOT:
-		p_term();
-		p_smplexpr_t();
-		break;
+		term_type = p_term();
+		smplexpr_type = p_smplexpr_t();
+		if(term_type == TYPE_INT && (smplexpr_type == TYPE_INT || smplexpr_type == TYPE_OK)) {
+			return TYPE_INT;
+		}
+		if(term_type == TYPE_REAL && (smplexpr_type == TYPE_REAL || smplexpr_type == TYPE_OK)) {
+			return TYPE_REAL;
+		}
+		if(term_type == TYPE_ERR || smplexpr_type == TYPE_ERR) {
+			return TYPE_ERR;
+		}
+		//semerr
+		return TYPE_ERR_NEW;
 	case TOK_ADDOP:
 		if(tok->attribute==ADDOP_ADD || tok->attribute==ADDOP_SUBTRACT) {
 			p_sign();
-			p_term();
-			p_smplexpr_t();
-			break;
+			term_type = p_term();
+			smplexpr_type = p_smplexpr_t();
+			if(term_type == TYPE_INT && (smplexpr_type == TYPE_INT || smplexpr_type == TYPE_OK)) {
+				return TYPE_INT;
+			}
+			if(term_type == TYPE_REAL && (smplexpr_type == TYPE_REAL || smplexpr_type == TYPE_OK)) {
+				return TYPE_REAL;
+			}
+			if(term_type == TYPE_ERR || smplexpr_type == TYPE_ERR) {
+				return TYPE_ERR;
+			}
+			//semerr
+			return TYPE_ERR;
 		}
 	default:
 		sprintf(synerr_buffer,
@@ -827,16 +948,30 @@ void p_smplexpr() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_NUM, TOK_PARENS_OPEN, TOK_NOT, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
+		return TYPE_ERR;
 	}
 }
 
-void p_smplexpr_t() {
+int p_smplexpr_t() {
+	int term_type;
+	int smplexpr_type;
+
 	switch(tok->token) {
 	case TOK_ADDOP:
 		match(TOK_ADDOP);
-		p_term();
-		p_smplexpr_t();
-		break;
+		term_type = p_term();
+		smplexpr_type = p_smplexpr_t();
+		if(term_type == TYPE_INT && (smplexpr_type == TYPE_INT || smplexpr_type == TYPE_OK)) {
+			return TYPE_INT;
+		}
+		if(term_type == TYPE_REAL && (smplexpr_type == TYPE_REAL || smplexpr_type == TYPE_OK)) {
+			return TYPE_REAL;
+		}
+		if(term_type == TYPE_ERR || smplexpr_type == TYPE_ERR) {
+			return TYPE_ERR;
+		}
+		//semerr
+		return TYPE_ERR_NEW;
 	case TOK_RELOP:
 	case TOK_SEMICOLON:
 	case TOK_END:
@@ -847,7 +982,7 @@ void p_smplexpr_t() {
 	case TOK_COMMA:
 	case TOK_PARENS_CLOSE:
 		// nop
-		break;
+		return TYPE_OK;
 	default:
 		sprintf(synerr_buffer,
 				"Expecting one of {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}; received {%s}",
@@ -866,18 +1001,29 @@ void p_smplexpr_t() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ADDOP, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
+		return TYPE_ERR;
 	}
 }
 
-void p_term() {
+int p_term() {
 	switch(tok->token) {
 	case TOK_ID:
 	case TOK_NUM:
 	case TOK_PARENS_OPEN:
 	case TOK_NOT:
-		p_factor();
-		p_term_t();
-		break;
+		int factor_type = p_factor();
+		int term_type = p_term_t();
+		if(factor_type == TYPE_INT && (term_type == TYPE_INT || term_type == TYPE_OK)) {
+			return TYPE_INT;
+		}
+		if(factor_type == TYPE_REAL && (term_type == TYPE_REAL || term_type == TYPE_OK)) {
+			return TYPE_REAL;
+		}
+		if(factor_type == TYPE_ERR || term_type == TYPE_ERR) {
+			return TYPE_ERR;
+		}
+		//semerr
+		return TYPE_ERR_NEW;
 	default:
 		sprintf(synerr_buffer,
 				"Expecting one of {%s}, {%s}, {%s}, {%s}; received {%s}",
@@ -890,16 +1036,27 @@ void p_term() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_NUM, TOK_PARENS_OPEN, TOK_NOT, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
+		return TYPE_ERR;
 	}
 }
 
-void p_term_t() {
+int p_term_t() {
 	switch(tok->token) {
 	case TOK_MULOP:
 		match(TOK_MULOP);
-		p_factor();
-		p_term_t();
-		break;
+		int factor_type = p_factor();
+		int term_type = p_term_t();
+		if(factor_type == TYPE_INT && (term_type == TYPE_INT || term_type == TYPE_OK)) {
+			return TYPE_INT;
+		}
+		if(factor_type == TYPE_REAL && (term_type == TYPE_REAL || term_type == TYPE_OK)) {
+			return TYPE_REAL;
+		}
+		if(factor_type == TYPE_ERR || term_type == TYPE_ERR) {
+			return TYPE_ERR;
+		}
+		//semerr
+		return TYPE_ERR_NEW;
 	case TOK_ADDOP:
 	case TOK_RELOP:
 	case TOK_SEMICOLON:
@@ -911,7 +1068,7 @@ void p_term_t() {
 	case TOK_COMMA:
 	case TOK_PARENS_CLOSE:
 		// nop
-		break;
+		return TYPE_OK;
 	default:
 		sprintf(synerr_buffer,
 				"Expecting one of {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}; received {%s}",
@@ -931,27 +1088,36 @@ void p_term_t() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_MULOP, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
+		return TYPE_ERR;
 	}
 }
 
-void p_factor() {
+int p_factor() {
 	switch(tok->token) {
 	case TOK_ID:
+		int id_type = gettype(tok->lex);
 		match(TOK_ID);
-		p_factor_t();
+		int tail_type = p_factor_t();
 		break;
 	case TOK_NUM:
-		match(TOK_NUM);
-		break;
+		int num_type = match2(TOK_NUM, tok->attribute);
+		return num_type;
 	case TOK_PARENS_OPEN:
 		match(TOK_PARENS_OPEN);
-		p_expr();
+		int expr_type = p_expr();
 		match(TOK_PARENS_CLOSE);
-		break;
+		return expr_type;
 	case TOK_NOT:
 		match(TOK_NOT);
-		p_factor();
-		break;
+		int factor_type = p_factor();
+		if(factor_type == TYPE_BOOL) {
+			return TYPE_BOOL;
+		}
+		if(factor_type==TYPE_INT || factor_type==TYPE_REAL) {
+			//semerr
+			return TYPE_ERR_NEW;
+		}
+		return TYPE_ERR;
 	default:
 		sprintf(synerr_buffer,
 				"Expecting one of {%s}, {%s}, {%s}, {%s}; received {%s}",
@@ -964,10 +1130,11 @@ void p_factor() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_NUM, TOK_PARENS_OPEN, TOK_NOT, TOK_MULOP, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
+		return TYPE_ERR;
 	}
 }
 
-void p_factor_t() {
+int p_factor_t() {
 	switch(tok->token) {
 	case TOK_PARENS_OPEN:
 		match(TOK_PARENS_OPEN);
@@ -976,8 +1143,13 @@ void p_factor_t() {
 		break;
 	case TOK_SQUARE_BRACKET_OPEN:
 		match(TOK_SQUARE_BRACKET_OPEN);
-		p_expr();
+		int expr_type = p_expr();
 		match(TOK_SQUARE_BRACKET_CLOSE);
+		if(expr_type != TYPE_INT) {
+			//semerr
+			return TYPE_ERR;
+		}
+		return TYPE_OK;
 		break;
 	case TOK_MULOP:
 	case TOK_ADDOP:
@@ -991,7 +1163,7 @@ void p_factor_t() {
 	case TOK_COMMA:
 	case TOK_PARENS_CLOSE:
 		// nop
-		break;
+		return TYPE_OK;
 	default:
 		sprintf(synerr_buffer,
 				"Expecting one of {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}; received {%s}",
@@ -1013,6 +1185,7 @@ void p_factor_t() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_PARENS_OPEN, TOK_SQUARE_BRACKET_OPEN, TOK_MULOP, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
+		return TYPE_ERR;
 	}
 }
 

@@ -169,7 +169,7 @@ Token *get_token() {
 					line_number,
 					lexeme,
 					result->token,
-					result->mem);
+					result->lex);
 		}
 		return result;
 	} else {

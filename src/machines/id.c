@@ -38,8 +38,7 @@ Token *run_id() {
 
 	if(result_token -> token == TOK_BLOCKED) {
 		//not a reserved word
-		void *m = get_or_add_symbol(lexeme);
-		result_token = token_mem_new(TOK_ID, m);
+		result_token = token_id_new(TOK_ID, lexeme);
 	}
 
 	return result_token;
