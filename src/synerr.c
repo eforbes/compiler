@@ -13,6 +13,10 @@ void synerr(char *message) {
 	fprintf(output_file, "SYNERR:\t%s\n", message);
 }
 
+void semerr(char *message) {
+	fprintf(output_file, "SEMERR:\t%s\n", message);
+}
+
 char *get_token_desc(int token_id) {
 	char *desc = (char*) malloc(MAX_DESC_LENGTH*sizeof(char));
 

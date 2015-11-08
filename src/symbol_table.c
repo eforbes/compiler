@@ -106,3 +106,11 @@ SymbolTableNode *getfnode(char *lexeme) {
 	//this should never happen
 	return NULL;
 }
+
+void set_param_count(int c) {
+	fhead -> this -> param_count = c;
+}
+
+void set_return_type(int rt) {
+	fhead -> this -> return_type = rt;
+}

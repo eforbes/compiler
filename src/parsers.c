@@ -7,6 +7,7 @@
 #include "compiler.h"
 #include "synerr.h"
 #include "type.h"
+#include "symbol_table.h"
 #include "machines/addop.h"
 
 #define SYNERR_BUFFER_SIZE 256
@@ -21,13 +22,33 @@ SymbolTableNode *fparam_cur_node;
 int array_checking;
 int array_indexed;
 
+int dparam_count;
+
+void check_fparam(int expr_type) {
+	if(expr_type != TYPE_ERR) {
+		if(is_fp_type(fparam_cur_node->type)) {
+			if(fp_to_type(fparam_cur_node->type) != expr_type) {
+				//semerr expected parameter fparam_count of type fp_to_type(fparam_cur_node->type) received expr_type
+				semerr("Incorrect function parameter type");
+			}
+			fparam_cur_node = fparam_cur_node -> prev;
+		}
+	}
+	fparam_count++;
+}
+
 void p_prog() {
 	switch(tok->token) {
 	case TOK_PROGRAM:
 		match(TOK_PROGRAM);
-		match(TOK_ID);
+		char *lex = match3(tok);
+		if(lex != NULL) {
+			check_add_green_node(lex, TYPE_PGM_NAME);
+		}
 		match(TOK_PARENS_OPEN);
+		dparam_count = 0;
 		p_idlst();
+		set_param_count(dparam_count);
 		match(TOK_PARENS_CLOSE);
 		match(TOK_SEMICOLON);
 		p_prog_t();
@@ -97,9 +118,15 @@ void p_prog_tt() {
 }
 
 void p_idlst() {
+	char *lex;
+
 	switch(tok->token) {
 	case TOK_ID:
-		match(TOK_ID);
+		lex = match3(tok);
+		if(lex!=NULL) {
+			check_add_blue_node(lex, TYPE_PGM_PARAM);
+			dparam_count++;
+		}
 		p_idlst_t();
 		break;
 	default:
@@ -115,10 +142,15 @@ void p_idlst() {
 }
 
 void p_idlst_t() {
+	char *lex;
 	switch(tok->token) {
 	case TOK_COMMA:
 		match(TOK_COMMA);
-		match(TOK_ID);
+		lex = match3(tok);
+		if(lex!=NULL) {
+			check_add_blue_node(lex, TYPE_PGM_PARAM);
+			dparam_count++;
+		}
 		p_idlst_t();
 		break;
 	case TOK_PARENS_CLOSE:
@@ -138,12 +170,18 @@ void p_idlst_t() {
 }
 
 void p_decls() {
+	char *lex;
+	int type_type;
+
 	switch(tok->token) {
 	case TOK_VAR:
 		match(TOK_VAR);
-		match(TOK_ID);
+		lex = match3(tok);
 		match(TOK_COLON);
-		p_type();
+		type_type = p_type();
+		if(lex!=NULL && type_type!=TYPE_ERR) {
+			check_add_blue_node(lex, type_type);
+		}
 		match(TOK_SEMICOLON);
 		p_decls_t();
 		break;
@@ -160,12 +198,18 @@ void p_decls() {
 }
 
 void p_decls_t() {
+	char *lex;
+	int type_type;
+
 	switch(tok->token) {
 	case TOK_VAR:
 		match(TOK_VAR);
-		match(TOK_ID);
+		lex = match3(tok);
 		match(TOK_COLON);
-		p_type();
+		type_type = p_type();
+		if(lex!=NULL && type_type!=TYPE_ERR) {
+			check_add_blue_node(lex, type_type);
+		}
 		match(TOK_SEMICOLON);
 		p_decls_t();
 		break;
@@ -187,22 +231,29 @@ void p_decls_t() {
 	}
 }
 
-void p_type() {
+int p_type() {
+	int n1;
+	int n2;
+	int type_type;
+
 	switch(tok->token) {
 	case TOK_INTEGER:
 	case TOK_REAL:
-		p_stdtype();
-		break;
+		return p_stdtype();
 	case TOK_ARRAY:
 		match(TOK_ARRAY);
 		match(TOK_SQUARE_BRACKET_OPEN);
-		match(TOK_NUM);
+		n1 = match2(TOK_NUM, tok->attribute);
 		match(TOK_DOT_DOT);
-		match(TOK_NUM);
+		n2 = match2(TOK_NUM, tok->attribute);
 		match(TOK_SQUARE_BRACKET_CLOSE);
 		match(TOK_OF);
-		p_stdtype();
-		break;
+		type_type = p_stdtype();
+		if(n1 != TYPE_INT || n2 != TYPE_INT) {
+			semerr("Array bounds must be integers");
+			return TYPE_ERR;
+		}
+		return type_to_array(type_type);
 	default:
 		sprintf(synerr_buffer,
 				"Expecting one of {%s}, {%s}, {%s}; received {%s}",
@@ -214,17 +265,18 @@ void p_type() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_INTEGER, TOK_REAL, TOK_ARRAY, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
+		return TYPE_ERR;
 	}
 }
 
-void p_stdtype() {
+int p_stdtype() {
 	switch(tok->token) {
 	case TOK_INTEGER:
 		match(TOK_INTEGER);
-		break;
+		return TYPE_INT;
 	case TOK_REAL:
 		match(TOK_REAL);
-		break;
+		return TYPE_REAL;
 	default:
 		sprintf(synerr_buffer,
 				"Expecting one of {%s}, {%s}; received {%s}",
@@ -235,6 +287,7 @@ void p_stdtype() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_INTEGER, TOK_REAL, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
+		return TYPE_ERR;
 	}
 }
 
@@ -242,6 +295,7 @@ void p_subprogdecls() {
 	switch(tok->token) {
 	case TOK_FUNCTION:
 		p_subprogdecl();
+		complete_function();
 		match(TOK_SEMICOLON);
 		p_subprogdecls_t();
 		break;
@@ -375,16 +429,20 @@ void p_subproghead() {
 }
 
 void p_subproghead_t() {
+	int type_type;
+
 	switch(tok->token) {
 	case TOK_PARENS_OPEN:
 		p_args();
 		match(TOK_COLON);
-		p_stdtype();
+		type_type = p_stdtype();
+		set_return_type(type_type);
 		match(TOK_SEMICOLON);
 		break;
 	case TOK_COLON:
 		match(TOK_COLON);
-		p_stdtype();
+		type_type = p_stdtype();
+		set_return_type(type_type);
 		match(TOK_SEMICOLON);
 		break;
 	default:
@@ -404,7 +462,9 @@ void p_args() {
 	switch(tok->token) {
 	case TOK_PARENS_OPEN:
 		match(TOK_PARENS_OPEN);
+		dparam_count = 0;
 		p_paramlst();
+		set_param_count(dparam_count);
 		match(TOK_PARENS_CLOSE);
 		break;
 	default:
@@ -420,11 +480,20 @@ void p_args() {
 }
 
 void p_paramlst() {
+	char *lex;
+	int type_type;
+
 	switch(tok->token) {
 	case TOK_ID:
-		match(TOK_ID);
+		lex = match3(tok);
 		match(TOK_COLON);
-		p_type();
+		type_type = p_type();
+
+		if(lex!=NULL && type_type!=TYPE_ERR) {
+			check_add_blue_node(lex, type_to_fp(type_type));
+			dparam_count++;
+		}
+
 		p_paramlst_t();
 		break;
 	default:
@@ -440,12 +509,19 @@ void p_paramlst() {
 }
 
 void p_paramlst_t() {
+	char *lex;
+	int type_type;
+
 	switch(tok->token) {
 	case TOK_SEMICOLON:
 		match(TOK_SEMICOLON);
-		match(TOK_ID);
+		lex = match3(tok);
 		match(TOK_COLON);
-		p_type();
+		type_type = p_type();
+		if(lex!=NULL && type_type!=TYPE_ERR) {
+			check_add_blue_node(lex, type_to_fp(type_type));
+			dparam_count++;
+		}
 		p_paramlst_t();
 		break;
 	case TOK_PARENS_CLOSE:
@@ -599,7 +675,7 @@ void p_stmt() {
 		if(variable_type == TYPE_REAL && expr_type == TYPE_REAL) {
 			return;
 		}
-		//semerr
+		semerr("Assigment types don't match");
 
 		break;
 	case TOK_BEGIN:
@@ -675,7 +751,7 @@ int p_variable() {
 
 	switch(tok->token) {
 	case TOK_ID:
-		id_type = gettype(tok -> lex);
+		id_type = get_type(tok -> lex);
 		match(TOK_ID);
 		variable_type = p_variable_t();
 		if(id_type == TYPE_ERR || variable_type == TYPE_ERR) {
@@ -688,6 +764,12 @@ int p_variable() {
 			return array_to_type(id_type);
 		}
 		//semerr assigning to array var or using basic type as array
+		if((id_type == TYPE_INT || id_type == TYPE_REAL) && variable_type == TYPE_INT) {
+			semerr("Attempting to use standard type as array");
+		}
+		if((id_type == TYPE_A_INT || id_type == TYPE_A_REAL) && variable_type == TYPE_OK) {
+			semerr("Attempting to assign a value to an entire array");
+		}
 		return TYPE_ERR;
 	default:
 		sprintf(synerr_buffer,
@@ -718,7 +800,7 @@ int p_variable_t() {
 		if(expr_type == TYPE_ERR) {
 			return TYPE_ERR;
 		}
-		//semerr using wrong type as array index
+		semerr("Array index must be integer");
 		return TYPE_ERR;
 	case TOK_ASSIGNOP:
 		// nop
@@ -740,7 +822,6 @@ int p_variable_t() {
 
 void p_exprlst() {
 	int expr_type;
-	int exprlst_type;
 
 	switch(tok->token) {
 	case TOK_ID:
@@ -826,7 +907,7 @@ int p_expr() {
 		if(expr_type == TYPE_BOOL) {
 			return TYPE_BOOL;
 		}
-		//semerr
+		//TODO: semerr? can you compare int and reals? 5 < 9.3
 		return TYPE_ERR;
 	case TOK_ADDOP:
 		if(tok->attribute==ADDOP_ADD || tok->attribute==ADDOP_SUBTRACT) {
@@ -841,7 +922,7 @@ int p_expr() {
 			if(expr_type == TYPE_BOOL) {
 				return TYPE_BOOL;
 			}
-			//semerr
+			//semerr?
 			return TYPE_ERR;
 		}
 	default:
@@ -925,7 +1006,7 @@ int p_smplexpr() {
 		if(term_type == TYPE_ERR || smplexpr_type == TYPE_ERR) {
 			return TYPE_ERR;
 		}
-		//semerr
+		semerr("Attempting to perform arithmetic on mismatched types");
 		return TYPE_ERR_NEW;
 	case TOK_ADDOP:
 		if(tok->attribute==ADDOP_ADD || tok->attribute==ADDOP_SUBTRACT) {
@@ -941,7 +1022,7 @@ int p_smplexpr() {
 			if(term_type == TYPE_ERR || smplexpr_type == TYPE_ERR) {
 				return TYPE_ERR;
 			}
-			//semerr
+			semerr("Attempting to perform arithmetic on mismatched types");
 			return TYPE_ERR;
 		}
 	default:
@@ -980,7 +1061,7 @@ int p_smplexpr_t() {
 		if(term_type == TYPE_ERR || smplexpr_type == TYPE_ERR) {
 			return TYPE_ERR;
 		}
-		//semerr
+		semerr("Attempting to perform arithmetic on mismatched types");
 		return TYPE_ERR_NEW;
 	case TOK_RELOP:
 	case TOK_SEMICOLON:
@@ -1016,13 +1097,16 @@ int p_smplexpr_t() {
 }
 
 int p_term() {
+	int factor_type;
+	int term_type;
+
 	switch(tok->token) {
 	case TOK_ID:
 	case TOK_NUM:
 	case TOK_PARENS_OPEN:
 	case TOK_NOT:
-		int factor_type = p_factor();
-		int term_type = p_term_t();
+		factor_type = p_factor();
+		term_type = p_term_t();
 		if(factor_type == TYPE_INT && (term_type == TYPE_INT || term_type == TYPE_OK)) {
 			return TYPE_INT;
 		}
@@ -1032,7 +1116,7 @@ int p_term() {
 		if(factor_type == TYPE_ERR || term_type == TYPE_ERR) {
 			return TYPE_ERR;
 		}
-		//semerr
+		semerr("Attempting to perform arithmetic on mismatched types");
 		return TYPE_ERR_NEW;
 	default:
 		sprintf(synerr_buffer,
@@ -1065,8 +1149,8 @@ int p_term_t() {
 		if(factor_type == TYPE_ERR || term_type == TYPE_ERR) {
 			return TYPE_ERR;
 		}
-		//semerr
-		return TYPE_ERR_NEW;
+		semerr("Attempting to perform arithmetic on mismatched types");
+		return TYPE_ERR;
 	case TOK_ADDOP:
 	case TOK_RELOP:
 	case TOK_SEMICOLON:
@@ -1103,9 +1187,11 @@ int p_term_t() {
 }
 
 int p_factor() {
+	int id_type;
+
 	switch(tok->token) {
 	case TOK_ID:
-		int id_type = gettype(tok->lex);
+		id_type = get_type(tok->lex);
 
 		if(id_type != TYPE_ERR) {
 			if(id_type == TYPE_F_NAME) {
@@ -1131,13 +1217,14 @@ int p_factor() {
 		if(fparam_checking) {
 			if(fparam_count != fparam_total) {
 				//semerr received fparam_count parameters, expected fparam_total
+				semerr("Incorrect number of function parameters");
 			}
 			return getfnode(tok->lex)->return_type;
 		}
 
 		if(array_checking) {
 			if(!array_indexed) {
-				//semerr array used without index
+				semerr("Attempting to perform arithmetic on an entire array");
 			}
 			return array_to_type(id_type);
 		}
@@ -1159,7 +1246,7 @@ int p_factor() {
 		}
 
 		if(factor_type!=TYPE_ERR) {
-			//semerr can only negate booleans
+			semerr("Not can only be used on booleans");
 			return TYPE_ERR;
 		}
 		return TYPE_ERR;
@@ -1192,7 +1279,7 @@ void p_factor_t() {
 		match(TOK_SQUARE_BRACKET_CLOSE);
 		array_indexed = 1;
 		if(expr_type != TYPE_INT) {
-			//semerr array index must be integer
+			semerr("Array index must be integer");
 		}
 		break;
 	case TOK_MULOP:
@@ -1250,16 +1337,4 @@ void p_sign() {
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_NUM, TOK_PARENS_OPEN, TOK_NOT};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
-}
-
-void check_fparam(int expr_type) {
-	if(expr_type != TYPE_ERR) {
-		if(is_fp_type(fparam_cur_node->type)) {
-			if(fp_to_type(fparam_cur_node->type) != expr_type) {
-				//semerr expected parameter fparam_count of type fp_to_type(fparam_cur_node->type) received expr_type
-			}
-			fparam_cur_node = fparam_cur_node -> prev;
-		}
-	}
-	fparam_count++;
 }

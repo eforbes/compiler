@@ -34,4 +34,9 @@ int get_type(char *lexeme);
 
 SymbolTableNode *getfnode(char *lexeme);
 
+void complete_function();
+
+void set_param_count(int c);
+void set_return_type(int rt);
+
 #endif /* SYMBOL_TABLE_H_ */

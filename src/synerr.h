@@ -9,6 +9,7 @@
 #define SYNERR_H_
 
 void synerr(char *message);
+void semerr(char *message);
 char *get_token_desc(int token_id);
 void synch(int *synch_tokens, int size);
 

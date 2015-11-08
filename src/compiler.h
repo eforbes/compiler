@@ -12,5 +12,7 @@
 
 Token *tok;
 void match(int t);
+int match2(int t, int attr);
+char *match3(Token *t);
 
 #endif /* COMPILER_H_ */

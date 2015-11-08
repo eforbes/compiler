@@ -51,6 +51,16 @@ int match2(int t, int attr) {
 	return TYPE_ERR_NEW;
 }
 
+//Matches TOK_ID, returns the lexeme
+char *match3(Token *t) {
+	if(t->token == TOK_ID) {
+		char *l = t->lex;
+		tok = get_token();
+		return l;
+	}
+	return (void *) 0;
+}
+
 void parse() {
 	tok = get_token();
 	p_prog();

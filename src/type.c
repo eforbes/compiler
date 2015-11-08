@@ -57,3 +57,19 @@ int is_array_type(int type) {
 
 	return 0;
 }
+
+int type_to_fp(int type){
+	if(type == TYPE_INT) {
+		return TYPE_FP_INT;
+	}
+	if(type == TYPE_REAL) {
+		return TYPE_FP_REAL;
+	}
+	if(type == TYPE_A_INT) {
+		return TYPE_FP_A_INT;
+	}
+	if(type == TYPE_A_REAL) {
+		return TYPE_FP_A_REAL;
+	}
+	return TYPE_ERR;
+}

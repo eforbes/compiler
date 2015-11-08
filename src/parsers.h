@@ -8,6 +8,10 @@
 #ifndef PARSERS_H_
 #define PARSERS_H_
 
+#ifndef NULL
+#define NULL   ((void *) 0)
+#endif
+
 void p_prog();
 void p_prog_t();
 void p_prog_tt();
@@ -15,8 +19,8 @@ void p_idlst();
 void p_idlst_t();
 void p_decls();
 void p_decls_t();
-void p_type();
-void p_stdtype();
+int p_type();
+int p_stdtype();
 void p_subprogdecls();
 void p_subprogdecls_t();
 void p_subprogdecl();
@@ -34,17 +38,17 @@ void p_stmtlst();
 void p_stmtlst_t();
 void p_stmt();
 void p_stmt_t();
-void p_variable();
-void p_variable_t();
+int p_variable();
+int p_variable_t();
 void p_exprlst();
 void p_exprlst_t();
-void p_expr();
-void p_expr_t();
-void p_smplexpr();
-void p_smplexpr_t();
-void p_term();
-void p_term_t();
-void p_factor();
+int p_expr();
+int p_expr_t();
+int p_smplexpr();
+int p_smplexpr_t();
+int p_term();
+int p_term_t();
+int p_factor();
 void p_factor_t();
 void p_sign();
 
