@@ -413,7 +413,8 @@ void p_subproghead() {
 	switch(tok->token) {
 	case TOK_FUNCTION:
 		match(TOK_FUNCTION);
-		match(TOK_ID);
+		char *lex = match3(tok);
+		check_add_green_node(lex, TYPE_F_NAME);
 		p_subproghead_t();
 		break;
 	default:

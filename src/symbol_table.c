@@ -5,6 +5,7 @@
 
 #include "symbol_table.h"
 #include "type.h"
+#include "synerr.h"
 
 #ifndef NULL
 #define NULL   ((void *) 0)
@@ -35,6 +36,7 @@ FunctionNode *function_node_new(SymbolTableNode *fnode, FunctionNode *next) {
 
 //function nodes
 void check_add_green_node(char *fname, int ftype) {
+	printf("GREEN NODE: %s, %d\n", fname, ftype);
 	if(head==NULL) {
 		head = symbol_table_node_new(fname, ftype, COLOR_GREEN, NULL);
 		fhead = function_node_new(head, NULL);
@@ -57,6 +59,7 @@ void check_add_green_node(char *fname, int ftype) {
 }
 
 void check_add_blue_node(char *lexeme, int type) {
+	printf("BLUE NODE: %s, %d\n", lexeme, type);
 	SymbolTableNode *cur = head;
 	while(cur != NULL) {
 		if(strcmp(cur -> symbol, lexeme) == 0) {
@@ -77,6 +80,7 @@ void check_add_blue_node(char *lexeme, int type) {
 }
 
 void complete_function() {
+	printf("Completing function\n");
 	//move head pointer to top of fstack
 	head = fhead -> this;
 	//pop from fstack
@@ -84,14 +88,17 @@ void complete_function() {
 }
 
 int get_type(char *lexeme) {
+	printf("getting type of %s\n", lexeme);
 	SymbolTableNode *cur = head;
 	while(cur != NULL) {
+		printf("%s?\n", cur -> symbol);
 		if(strcmp(cur -> symbol, lexeme) == 0) {
+			printf("type: %d\n", cur -> type);
 			return cur -> type;
 		}
 		cur = cur -> next;
 	}
-
+	semerr("Undefined identifier");
 	return TYPE_ERR;
 }
 
@@ -109,8 +116,10 @@ SymbolTableNode *getfnode(char *lexeme) {
 
 void set_param_count(int c) {
 	fhead -> this -> param_count = c;
+	printf("setting param count for %s %d\n", fhead->this->symbol, c);
 }
 
 void set_return_type(int rt) {
 	fhead -> this -> return_type = rt;
+	printf("setting return type for %s %d\n", fhead->this->symbol, rt);
 }
