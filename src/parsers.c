@@ -13,6 +13,14 @@
 
 char synerr_buffer[SYNERR_BUFFER_SIZE];
 
+int fparam_total;
+int fparam_count;
+int fparam_checking;
+SymbolTableNode *fparam_cur_node;
+
+int array_checking;
+int array_indexed;
+
 void p_prog() {
 	switch(tok->token) {
 	case TOK_PROGRAM:
@@ -572,12 +580,10 @@ void p_stmtlst_t() {
 	}
 }
 
-int p_stmt() {
+void p_stmt() {
 	int variable_type;
 	int expr_type;
 
-	int stmt_type;
-	int stmt2_type;
 
 	switch(tok->token) {
 	case TOK_ID:
@@ -585,50 +591,45 @@ int p_stmt() {
 		match(TOK_ASSIGNOP);
 		expr_type = p_expr();
 		if(variable_type == TYPE_ERR || expr_type == TYPE_ERR) {
-			return TYPE_ERR;
+			return;
 		}
 		if(variable_type == TYPE_INT && expr_type == TYPE_INT) {
-			return TYPE_OK;
+			return;
 		}
 		if(variable_type == TYPE_REAL && expr_type == TYPE_REAL) {
-			return TYPE_OK;
+			return;
 		}
 		//semerr
 
-		return TYPE_ERR;
+		break;
 	case TOK_BEGIN:
-		return p_cmpndstmt();
+		p_cmpndstmt();
+		break;
 	case TOK_IF:
 		match(TOK_IF);
 		expr_type = p_expr();
 		match(TOK_THEN);
-		stmt_type = p_stmt();
-		stmt2_type = p_stmt_t();
+		p_stmt();
+		p_stmt_t();
 
 		if(expr_type != TYPE_BOOL) {
 			//synerr boolean expr required
-			return TYPE_ERR;
+			return;
 		}
 
-		if(stmt_type == TYPE_ERR || stmt2_type == TYPE_ERR) {
-			return TYPE_ERR;
-		}
-
-		return TYPE_OK;
+		return;
 	case TOK_WHILE:
 		match(TOK_WHILE);
 		expr_type = p_expr();
 		match(TOK_DO);
-		stmt_type = p_stmt();
+		p_stmt();
 
 		if(expr_type != TYPE_BOOL) {
 			//synerr boolean expr required
-			return TYPE_ERR;
+			return;
 		}
-		if(stmt_type == TYPE_ERR) {
-			return TYPE_ERR;
-		}
-		return TYPE_OK;
+
+		return;
 	default:
 		sprintf(synerr_buffer,
 				"Expecting one of {%s}, {%s}, {%s}, {%s}; received {%s}",
@@ -641,20 +642,19 @@ int p_stmt() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_BEGIN, TOK_IF, TOK_WHILE, TOK_END, TOK_ELSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
-
-		return TYPE_ERR;
 	}
 }
 
-int p_stmt_t() {
+void p_stmt_t() {
 	switch(tok->token) {
 	case TOK_ELSE:
 		match(TOK_ELSE);
-		return p_stmt();//TODO: is this right?
+		p_stmt();//TODO: is this right?
+		break;
 	case TOK_SEMICOLON:
 	case TOK_END:
 		// nop
-		return TYPE_OK;
+		break;
 	default:
 		sprintf(synerr_buffer,
 				"Expecting one of {%s}, {%s}, {%s}; received {%s}",
@@ -666,8 +666,6 @@ int p_stmt_t() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ELSE, TOK_END};
 		synch(array, sizeof(array)/sizeof(array[0]));
-
-		return TYPE_ERR;
 	}
 }
 
@@ -741,17 +739,26 @@ int p_variable_t() {
 }
 
 void p_exprlst() {
+	int expr_type;
+	int exprlst_type;
+
 	switch(tok->token) {
 	case TOK_ID:
 	case TOK_NUM:
 	case TOK_PARENS_OPEN:
 	case TOK_NOT:
-		p_expr();
+		expr_type = p_expr();
+
+		check_fparam(expr_type);
+
 		p_exprlst_t();
 		break;
 	case TOK_ADDOP:
 		if(tok->attribute==ADDOP_ADD || tok->attribute==ADDOP_SUBTRACT) {
-			p_expr();
+			expr_type = p_expr();
+
+			check_fparam(expr_type);
+
 			p_exprlst_t();
 			break;
 		}
@@ -773,10 +780,14 @@ void p_exprlst() {
 }
 
 void p_exprlst_t() {
+	int expr_type;
 	switch(tok->token) {
 	case TOK_COMMA:
 		match(TOK_COMMA);
-		p_expr();
+		expr_type = p_expr();
+
+		check_fparam(expr_type);
+
 		p_exprlst_t();
 		break;
 	case TOK_PARENS_CLOSE:
@@ -832,7 +843,6 @@ int p_expr() {
 			}
 			//semerr
 			return TYPE_ERR;
-			break;
 		}
 	default:
 		sprintf(synerr_buffer,
@@ -1096,12 +1106,45 @@ int p_factor() {
 	switch(tok->token) {
 	case TOK_ID:
 		int id_type = gettype(tok->lex);
+
+		if(id_type != TYPE_ERR) {
+			if(id_type == TYPE_F_NAME) {
+				SymbolTableNode *fnode = getfnode(tok->lex);
+				fparam_total = fnode -> param_count;
+				fparam_count = 0;
+				fparam_cur_node = fnode -> next;
+				fparam_checking = 1;
+			} else {
+				fparam_checking = 0;
+			}
+
+			array_checking = is_array_type(id_type);
+			array_indexed = 0;
+
+		} else {
+			fparam_checking = 0;
+		}
 		match(TOK_ID);
-		int tail_type = p_factor_t();
-		break;
+
+		p_factor_t();
+
+		if(fparam_checking) {
+			if(fparam_count != fparam_total) {
+				//semerr received fparam_count parameters, expected fparam_total
+			}
+			return getfnode(tok->lex)->return_type;
+		}
+
+		if(array_checking) {
+			if(!array_indexed) {
+				//semerr array used without index
+			}
+			return array_to_type(id_type);
+		}
+
+		return id_type;
 	case TOK_NUM:
-		int num_type = match2(TOK_NUM, tok->attribute);
-		return num_type;
+		return match2(TOK_NUM, tok->attribute);
 	case TOK_PARENS_OPEN:
 		match(TOK_PARENS_OPEN);
 		int expr_type = p_expr();
@@ -1110,12 +1153,14 @@ int p_factor() {
 	case TOK_NOT:
 		match(TOK_NOT);
 		int factor_type = p_factor();
+
 		if(factor_type == TYPE_BOOL) {
 			return TYPE_BOOL;
 		}
-		if(factor_type==TYPE_INT || factor_type==TYPE_REAL) {
-			//semerr
-			return TYPE_ERR_NEW;
+
+		if(factor_type!=TYPE_ERR) {
+			//semerr can only negate booleans
+			return TYPE_ERR;
 		}
 		return TYPE_ERR;
 	default:
@@ -1134,7 +1179,7 @@ int p_factor() {
 	}
 }
 
-int p_factor_t() {
+void p_factor_t() {
 	switch(tok->token) {
 	case TOK_PARENS_OPEN:
 		match(TOK_PARENS_OPEN);
@@ -1145,11 +1190,10 @@ int p_factor_t() {
 		match(TOK_SQUARE_BRACKET_OPEN);
 		int expr_type = p_expr();
 		match(TOK_SQUARE_BRACKET_CLOSE);
+		array_indexed = 1;
 		if(expr_type != TYPE_INT) {
-			//semerr
-			return TYPE_ERR;
+			//semerr array index must be integer
 		}
-		return TYPE_OK;
 		break;
 	case TOK_MULOP:
 	case TOK_ADDOP:
@@ -1163,7 +1207,7 @@ int p_factor_t() {
 	case TOK_COMMA:
 	case TOK_PARENS_CLOSE:
 		// nop
-		return TYPE_OK;
+		break;
 	default:
 		sprintf(synerr_buffer,
 				"Expecting one of {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}, {%s}; received {%s}",
@@ -1185,7 +1229,6 @@ int p_factor_t() {
 
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_PARENS_OPEN, TOK_SQUARE_BRACKET_OPEN, TOK_MULOP, TOK_RELOP, TOK_END, TOK_ELSE, TOK_THEN, TOK_DO, TOK_SQUARE_BRACKET_CLOSE, TOK_COMMA, TOK_PARENS_CLOSE};
 		synch(array, sizeof(array)/sizeof(array[0]));
-		return TYPE_ERR;
 	}
 }
 
@@ -1207,4 +1250,16 @@ void p_sign() {
 		int array[] = {TOK_SEMICOLON, TOK_EOF, TOK_ID, TOK_NUM, TOK_PARENS_OPEN, TOK_NOT};
 		synch(array, sizeof(array)/sizeof(array[0]));
 	}
+}
+
+void check_fparam(int expr_type) {
+	if(expr_type != TYPE_ERR) {
+		if(is_fp_type(fparam_cur_node->type)) {
+			if(fp_to_type(fparam_cur_node->type) != expr_type) {
+				//semerr expected parameter fparam_count of type fp_to_type(fparam_cur_node->type) received expr_type
+			}
+			fparam_cur_node = fparam_cur_node -> prev;
+		}
+	}
+	fparam_count++;
 }

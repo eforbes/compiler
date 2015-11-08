@@ -33,6 +33,8 @@
 
 int array_to_type(int atype);
 int type_to_array(int type);
-//int type_to_fp(int type);
+int fp_to_type(int fptype);
+int is_fp_type(int fptype);
+int is_array_type(int type);
 
 #endif /* TYPE_H_ */
