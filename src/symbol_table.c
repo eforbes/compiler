@@ -33,29 +33,6 @@ FunctionNode *function_node_new(SymbolTableNode *fnode, FunctionNode *next) {
 	return n;
 }
 
-//void *get_or_add_symbol(char *sym) {
-//	if(!symbol_table_initialized) {
-//		init_symbol_table();
-//	}
-//
-//	SymbolTableNode *cur = head;
-//	while(cur -> next != NULL) {
-//		if(strcmp(cur -> symbol, sym) == 0) {
-//			return cur -> symbol;
-//		}
-//		cur = cur -> next;
-//	}
-//
-//	int l = strlen(sym);
-//	char *new_sym = (char*) malloc((l + 1) * sizeof(char));
-//	memcpy(new_sym, sym, l);
-//	new_sym[l] = '\0';
-//
-//	SymbolTableNode *new = symbol_table_node_new(new_sym, head);
-//	head = new;
-//	return new_sym;
-//}
-
 //function nodes
 void check_add_green_node(char *fname, int ftype) {
 	if(head==NULL) {
@@ -80,7 +57,30 @@ void check_add_green_node(char *fname, int ftype) {
 }
 
 void check_add_blue_node(char *lexeme, int type) {
+	SymbolTableNode *cur = head;
+	while(cur != NULL) {
+		if(strcmp(cur -> symbol, lexeme) == 0) {
+			//semerr duplicate variable declaration in this scope
+			return;
+		}
+		if(cur->color == COLOR_GREEN) {
+			//OK, add blue node
+			SymbolTableNode *new = symbol_table_node_new(lexeme, type, COLOR_BLUE, head);
+			head -> prev = new;
+			head = new;
+			return;
+		}
+		cur = cur -> next;
+	}
+	//this should never happen
+	return;
+}
 
+void complete_function() {
+	//move head pointer to top of fstack
+	head = fhead -> this;
+	//pop from fstack
+	fhead = fhead -> next;
 }
 
 int get_type(char *lexeme) {
