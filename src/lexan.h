@@ -11,5 +11,6 @@ void move_f_back();
 char *get_lexeme();
 Token *get_token();
 FILE *output_file;
+FILE *address_file;
 
 #endif /* LEXAN_H_ */

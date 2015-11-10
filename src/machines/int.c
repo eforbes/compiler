@@ -50,7 +50,7 @@ Token *run_int() {
 		return error_token;
 	}
 
-	Token *result_token = token_new(TOK_NUM, NUM_INT);
+	Token *result_token = token_int_new(TOK_NUM, NUM_INT, atoi(get_lexeme()));
 	return result_token;
 }
 

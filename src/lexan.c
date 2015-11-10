@@ -35,7 +35,7 @@
 char buffer[LINE_MAX];
 int b = 0, f = 0; // indexes within the buffer
 
-FILE *input_file, *output_file, *token_file;
+FILE *input_file, *output_file, *token_file, *address_file;
 
 void open_files(char *input_file_name) {
 	char outputFileName[strlen(input_file_name)+6];
@@ -46,9 +46,14 @@ void open_files(char *input_file_name) {
 	strcpy(tokenFileName, input_file_name);
 	strcat(tokenFileName, ".token");
 
+	char addressFileName[strlen(input_file_name)+5];
+	strcpy(addressFileName, input_file_name);
+	strcat(addressFileName, ".addr");
+
 	input_file = fopen(input_file_name, "r");
 	output_file = fopen(outputFileName, "w");
 	token_file = fopen(tokenFileName, "w");
+	address_file = fopen(addressFileName, "w");
 }
 
 char* load_line(char *input_file_name) {
@@ -116,6 +121,7 @@ Token *get_token() {
 			fclose(input_file);
 			fclose(output_file);
 			fclose(token_file);
+			fclose(address_file);
 
 			first_eof = 0;
 		}

@@ -17,6 +17,7 @@
 char synerr_buffer[SYNERR_BUFFER_SIZE];
 
 int dparam_count;
+int darray_size;
 
 ParamCheckNode *param_check_head = NULL;
 
@@ -147,7 +148,7 @@ void p_idlst() {
 	case TOK_ID:
 		lex = match3(tok);
 		if(lex!=NULL) {
-			check_add_blue_node(lex, TYPE_PGM_PARAM);
+			check_add_blue_node(lex, TYPE_PGM_PARAM, 0);
 			dparam_count++;
 		}
 		p_idlst_t();
@@ -171,7 +172,7 @@ void p_idlst_t() {
 		match(TOK_COMMA);
 		lex = match3(tok);
 		if(lex!=NULL) {
-			check_add_blue_node(lex, TYPE_PGM_PARAM);
+			check_add_blue_node(lex, TYPE_PGM_PARAM, 0);
 			dparam_count++;
 		}
 		p_idlst_t();
@@ -203,7 +204,12 @@ void p_decls() {
 		match(TOK_COLON);
 		type_type = p_type();
 		if(lex!=NULL && type_type!=TYPE_ERR) {
-			check_add_blue_node(lex, type_type);
+			if(is_array_type(type_type)) {
+				printf("ALPHA\n");
+				check_add_blue_node(lex, type_type, darray_size);
+			} else{
+				check_add_blue_node(lex, type_type, 0);
+			}
 		}
 		match(TOK_SEMICOLON);
 		p_decls_t();
@@ -231,7 +237,12 @@ void p_decls_t() {
 		match(TOK_COLON);
 		type_type = p_type();
 		if(lex!=NULL && type_type!=TYPE_ERR) {
-			check_add_blue_node(lex, type_type);
+			if(is_array_type(type_type)) {
+				printf("ALPHA\n");
+				check_add_blue_node(lex, type_type, darray_size);
+			} else{
+				check_add_blue_node(lex, type_type, 0);
+			}
 		}
 		match(TOK_SEMICOLON);
 		p_decls_t();
@@ -255,8 +266,8 @@ void p_decls_t() {
 }
 
 int p_type() {
-	int n1;
-	int n2;
+	int n1_value, n2_value;
+	int n1, n2;
 	int type_type;
 
 	switch(tok->token) {
@@ -266,8 +277,11 @@ int p_type() {
 	case TOK_ARRAY:
 		match(TOK_ARRAY);
 		match(TOK_SQUARE_BRACKET_OPEN);
+
+		n1_value = tok -> value;
 		n1 = match2(TOK_NUM, tok->attribute);
 		match(TOK_DOT_DOT);
+		n2_value = tok -> value;
 		n2 = match2(TOK_NUM, tok->attribute);
 		match(TOK_SQUARE_BRACKET_CLOSE);
 		match(TOK_OF);
@@ -276,6 +290,8 @@ int p_type() {
 			semerr("Array bounds must be integers");
 			return TYPE_ERR;
 		}
+		darray_size = n2_value - n1_value;
+		printf("array sz: %d\n", darray_size);
 		return type_to_array(type_type);
 	default:
 		sprintf(synerr_buffer,
@@ -516,7 +532,7 @@ void p_paramlst() {
 		type_type = p_type();
 
 		if(lex!=NULL && type_type!=TYPE_ERR) {
-			check_add_blue_node(lex, type_to_fp(type_type));
+			check_add_blue_node(lex, type_to_fp(type_type), 0);
 			dparam_count++;
 		}
 
@@ -545,7 +561,7 @@ void p_paramlst_t() {
 		match(TOK_COLON);
 		type_type = p_type();
 		if(lex!=NULL && type_type!=TYPE_ERR) {
-			check_add_blue_node(lex, type_to_fp(type_type));
+			check_add_blue_node(lex, type_to_fp(type_type), 0);
 			dparam_count++;
 		}
 		p_paramlst_t();
