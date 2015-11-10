@@ -43,9 +43,10 @@ void check_add_green_node(char *fname, int ftype) {
 	} else {
 		SymbolTableNode *cur = head;
 		while(cur != NULL) {
+			printf("checking dupe %s %s\n", cur->symbol, fname);
 			if(strcmp(cur -> symbol, fname) == 0) {
-				//semerr
-				return;
+				semerr("Duplicate identifier for function name in scope");
+				break;
 			}
 			cur = cur -> next;
 		}
@@ -63,7 +64,7 @@ void check_add_blue_node(char *lexeme, int type) {
 	SymbolTableNode *cur = head;
 	while(cur != NULL) {
 		if(strcmp(cur -> symbol, lexeme) == 0) {
-			//semerr duplicate variable declaration in this scope
+			semerr("duplicate variable declaration in this scope");
 			return;
 		}
 		if(cur->color == COLOR_GREEN) {

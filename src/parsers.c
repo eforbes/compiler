@@ -30,6 +30,7 @@ ParamCheckNode *param_check_node_new(SymbolTableNode *this_in, int param_total_i
 }
 
 void check_fparam(int expr_type) {
+	if(param_check_head==NULL) return;
 	SymbolTableNode *param_cur_node = param_check_head -> this;
 	if(expr_type != TYPE_ERR && param_cur_node!=NULL) {
 		if(is_fp_type(param_cur_node -> type)) {
@@ -987,9 +988,12 @@ int p_expr() {
 		if(smplexpr_type == TYPE_A_REAL && expr_type == TYPE_OK) {
 			return TYPE_A_REAL;
 		}
+		if(smplexpr_type == TYPE_BOOL && expr_type == TYPE_BOOL) {
+			return TYPE_BOOL;
+		}
 
-		//???
-		semerr("uknown error: expr/TOK_ID");
+		//ERR*
+		semerr("you can only compare matched types");
 		return TYPE_ERR;
 	case TOK_ADDOP:
 		if(tok->attribute==ADDOP_ADD || tok->attribute==ADDOP_SUBTRACT) {
@@ -1028,8 +1032,12 @@ int p_expr() {
 				return TYPE_A_REAL;
 			}
 
-			//???
-			semerr("uknown error: expr/TOK_ADDOP");
+			if(smplexpr_type == TYPE_BOOL && expr_type == TYPE_BOOL) {
+				return TYPE_BOOL;
+			}
+
+			//ERR*
+			semerr("you can only compare matched types");
 			return TYPE_ERR;
 		}
 	default:
