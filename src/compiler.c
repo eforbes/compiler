@@ -48,7 +48,7 @@ int match2(int t, int attr) {
 			return TYPE_REAL;
 		}
 	}
-	return TYPE_ERR_NEW;
+	return TYPE_ERR;
 }
 
 //Matches TOK_ID, returns the lexeme

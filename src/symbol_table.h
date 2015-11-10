@@ -33,6 +33,7 @@ void check_add_blue_node(char *lexeme, int type);
 int get_type(char *lexeme);
 
 SymbolTableNode *getfnode(char *lexeme);
+int get_return_type(char *lexeme);
 
 void complete_function();
 

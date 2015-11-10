@@ -103,15 +103,20 @@ int get_type(char *lexeme) {
 }
 
 SymbolTableNode *getfnode(char *lexeme) {
-	FunctionNode *cur = fhead;
+	printf("gettingfnode: %s\n", lexeme);
+	SymbolTableNode *cur = head;
 	while(cur != NULL) {
-		if(strcmp(cur -> this -> symbol, lexeme) == 0) {
-			return cur -> this;
+		if(strcmp(cur -> symbol, lexeme) == 0) {
+			return cur;
 		}
 		cur = cur -> next;
 	}
 	//this should never happen
 	return NULL;
+}
+
+int get_return_type(char *lexeme) {
+	return getfnode(lexeme)->return_type;
 }
 
 void set_param_count(int c) {

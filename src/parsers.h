@@ -4,6 +4,7 @@
  *  Created on: Sep 26, 2015
  *      Author: Evan
  */
+#include "symbol_table.h"
 
 #ifndef PARSERS_H_
 #define PARSERS_H_
@@ -11,6 +12,19 @@
 #ifndef NULL
 #define NULL   ((void *) 0)
 #endif
+
+struct ParamCheckNode {
+	SymbolTableNode *this;
+	int param_total;
+	int param_count;
+	struct ParamCheckNode *next;
+};
+
+typedef struct ParamCheckNode ParamCheckNode;
+
+ParamCheckNode *param_check_node_new(SymbolTableNode *this_in, int param_total_in, int param_count_in, ParamCheckNode *next_in);
+
+
 
 void p_prog();
 void p_prog_t();
@@ -27,7 +41,7 @@ void p_subprogdecl();
 void p_subprogdecl_t();
 void p_subprogdecl_tt();
 void p_subproghead();
-void p_subproghead_t();
+int p_subproghead_t();
 void p_args();
 void p_paramlst();
 void p_paramlst_t();
@@ -49,7 +63,7 @@ int p_smplexpr_t();
 int p_term();
 int p_term_t();
 int p_factor();
-void p_factor_t();
+int p_factor_t();
 void p_sign();
 
 #endif /* PARSERS_H_ */

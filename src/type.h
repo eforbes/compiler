@@ -31,6 +31,9 @@
 #define TYPE_ERR 998
 #define TYPE_ERR_NEW 999
 
+#define TYPE_ARRAY_INDEX 1000
+#define TYPE_PARAM_LIST 1001
+
 int array_to_type(int atype);
 int type_to_array(int type);
 int fp_to_type(int fptype);
