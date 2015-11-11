@@ -2,19 +2,24 @@
 #include "token.h"
 #include "compiler.h"
 #include "lexan.h"
+#include "type.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_DESC_LENGTH 15
+#define MAX_DESC_LENGTH 20
+
+int synerr_count, semerr_count;
 
 void synerr(char *message) {
 	fprintf(output_file, "SYNERR:\t%s\n", message);
+	synerr_count++;
 }
 
 void semerr(char *message) {
 	fprintf(output_file, "SEMERR:\t%s\n", message);
+	semerr_count++;
 }
 
 char *get_token_desc(int token_id) {
@@ -53,7 +58,37 @@ char *get_token_desc(int token_id) {
 	case TOK_VAR: sprintf(desc, "var"); break;
 	case TOK_WHILE: sprintf(desc, "while"); break;
 	case TOK_LEXERR: sprintf(desc, "a lexerr"); break;
-	default: sprintf(desc, "uknown"); break;
+	default: sprintf(desc, "unknown"); break;
+	}
+	return desc;
+}
+
+char *get_type_desc(int type) {
+	char *desc = (char*) malloc(MAX_DESC_LENGTH*sizeof(char));
+	switch(type) {
+	case TYPE_INT:
+	case TYPE_FP_INT:
+		sprintf(desc, "an integer");
+		break;
+	case TYPE_REAL:
+	case TYPE_FP_REAL:
+		sprintf(desc, "a real");
+		break;
+	case TYPE_A_INT:
+	case TYPE_FP_A_INT:
+		sprintf(desc, "an integer array");
+		break;
+	case TYPE_A_REAL:
+	case TYPE_FP_A_REAL:
+		sprintf(desc, "a real array");
+		break;
+	case TYPE_BOOL:
+		sprintf(desc, "a boolean");
+		break;
+	case TYPE_F_NAME:
+		sprintf(desc, "a function");
+		break;
+	default: sprintf(desc, "an unknown type"); break;
 	}
 	return desc;
 }

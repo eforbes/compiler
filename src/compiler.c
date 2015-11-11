@@ -21,7 +21,7 @@ void match(int t) {
 		if(t != TOK_EOF) {
 			tok = get_token();
 		} else {
-			puts("Parse complete");
+			printf("Parser reached end of file\n");
 		}
 	} else {
 		//SYNERR
@@ -77,5 +77,7 @@ int main(int argc, char **argv) {
 
 	parse();
 
+	printf("Parse complete for %s\n", input_file_name);
+	printf("%d lexerr, %d synerr, %d semerr\n", lexerr_count, synerr_count, semerr_count);
 	return 0;
 }

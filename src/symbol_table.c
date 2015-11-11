@@ -15,6 +15,10 @@
 #define COLOR_GREEN 1
 #define COLOR_BLUE 2
 
+#define SYMERR_BUFFER_SIZE 256
+
+char symerr_buffer[SYMERR_BUFFER_SIZE];
+
 SymbolTableNode *head;
 FunctionNode *fhead;
 
@@ -33,10 +37,8 @@ SymbolTableNode *symbol_table_node_new(char *sym, int type_in, int array_size_in
     	int addr =  fhead->this->address;
     	int sz = get_size_of(type_in);
     	if(is_array_type(type_in)) {
-    		printf("BETA\n");
     		sz *= array_size_in;
     	}
-    	printf("addr: %d, sz: %d\n", addr, sz);
     	n -> address = addr;
     	fhead->this->address+= sz;
     	if(sz>0) {
@@ -56,7 +58,6 @@ FunctionNode *function_node_new(SymbolTableNode *fnode, FunctionNode *next) {
 
 //function nodes
 void check_add_green_node(char *fname, int ftype) {
-	printf("GREEN NODE: %s, %d\n", fname, ftype);
 	if(head==NULL) {
 		head = symbol_table_node_new(fname, ftype, 0, COLOR_GREEN, NULL);
 		fhead = function_node_new(head, NULL);
@@ -64,14 +65,19 @@ void check_add_green_node(char *fname, int ftype) {
 		SymbolTableNode *cur = head;
 		while(cur != NULL) {
 			if(strcmp(cur -> symbol, fname) == 0) {
-				semerr("Duplicate identifier for function name in scope");
+				sprintf(symerr_buffer,
+					"Duplicate identifier for function name in this scope: %s",
+					fname);
+				semerr(symerr_buffer);
 				break;
 			}
 			cur = cur -> next;
 		}
 
 		SymbolTableNode *new = symbol_table_node_new(fname, ftype, 0, COLOR_GREEN, head);
-		head -> prev = new;
+		if(head -> prev == NULL) {
+			head -> prev = new;
+		}
 		head = new;
 		FunctionNode *fnew = function_node_new(new, fhead);
 		fhead = fnew;
@@ -79,20 +85,23 @@ void check_add_green_node(char *fname, int ftype) {
 }
 
 void check_add_blue_node(char *lexeme, int type, int array_size) {
-	printf("BLUE NODE: %s, %d\n", lexeme, type);
 	SymbolTableNode *cur = head;
 	while(cur != NULL) {
 		if(strcmp(cur -> symbol, lexeme) == 0) {
-			semerr("duplicate variable declaration in this scope");
+			sprintf(symerr_buffer,
+				"Duplicate variable declaration in this scope: %s",
+				lexeme);
+			semerr(symerr_buffer);
 			return;
 		}
 		if(cur->color == COLOR_GREEN) {
 			//OK, add blue node
 			SymbolTableNode *new = symbol_table_node_new(lexeme, type, array_size, COLOR_BLUE, head);
-			head -> prev = new;
+			if(head -> prev == NULL) {
+				head -> prev = new;
+			}
 			head = new;
 
-			printf("address of %s: %d\n", lexeme, new->address);
 			return;
 		}
 		cur = cur -> next;
@@ -102,7 +111,6 @@ void check_add_blue_node(char *lexeme, int type, int array_size) {
 }
 
 void complete_function() {
-	printf("Completing function\n");
 	//move head pointer to top of fstack
 	head = fhead -> this;
 	//pop from fstack
@@ -117,7 +125,10 @@ int get_type(char *lexeme) {
 		}
 		cur = cur -> next;
 	}
-	semerr("Undefined identifier");
+	sprintf(symerr_buffer,
+		"Undefined identifier in this scope: %s",
+		lexeme);
+	semerr(symerr_buffer);
 	return TYPE_ERR;
 }
 

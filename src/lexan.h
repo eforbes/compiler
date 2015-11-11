@@ -13,4 +13,6 @@ Token *get_token();
 FILE *output_file;
 FILE *address_file;
 
+int lexerr_count;
+
 #endif /* LEXAN_H_ */

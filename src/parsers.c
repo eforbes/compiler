@@ -36,8 +36,12 @@ void check_fparam(int expr_type) {
 	if(expr_type != TYPE_ERR && param_cur_node!=NULL) {
 		if(is_fp_type(param_cur_node -> type)) {
 			if(fp_to_type(param_cur_node -> type) != expr_type) {
-				//semerr expected parameter fparam_count of type fp_to_type(fparam_cur_node->type) received expr_type
-				semerr("Incorrect function parameter type");
+				sprintf(synerr_buffer,
+						"Expected parameter %d to be %s type, received %s type instead",
+						param_check_head->param_count,
+						get_type_desc(param_cur_node->type),
+						get_type_desc(expr_type));
+				semerr(synerr_buffer);
 			}
 			param_check_head -> this = param_check_head -> this -> prev;
 		}
@@ -46,7 +50,6 @@ void check_fparam(int expr_type) {
 }
 
 void pre_check_fparams(char *lex) {
-	printf("precheck %s\n", lex);
 	SymbolTableNode *n = getfnode(lex);
 
 	ParamCheckNode *new = param_check_node_new(n->prev, n->param_count, 0, param_check_head);
@@ -54,9 +57,12 @@ void pre_check_fparams(char *lex) {
 }
 
 void check_fparams() {
-	printf("checks %d %d\n",param_check_head->param_count,param_check_head->param_total);
-	if(param_check_head->param_count!=param_check_head->param_total) {
-		semerr("Function parameter count does not match definition");
+	if(param_check_head->param_count != param_check_head->param_total) {
+		sprintf(synerr_buffer,
+				"Expected %d parameters, received %d",
+				param_check_head->param_total,
+				param_check_head->param_count);
+		semerr(synerr_buffer);
 	}
 	param_check_head = param_check_head -> next;
 }
@@ -205,7 +211,6 @@ void p_decls() {
 		type_type = p_type();
 		if(lex!=NULL && type_type!=TYPE_ERR) {
 			if(is_array_type(type_type)) {
-				printf("ALPHA\n");
 				check_add_blue_node(lex, type_type, darray_size);
 			} else{
 				check_add_blue_node(lex, type_type, 0);
@@ -238,7 +243,6 @@ void p_decls_t() {
 		type_type = p_type();
 		if(lex!=NULL && type_type!=TYPE_ERR) {
 			if(is_array_type(type_type)) {
-				printf("ALPHA\n");
 				check_add_blue_node(lex, type_type, darray_size);
 			} else{
 				check_add_blue_node(lex, type_type, 0);
@@ -291,7 +295,6 @@ int p_type() {
 			return TYPE_ERR;
 		}
 		darray_size = n2_value - n1_value;
-		printf("array sz: %d\n", darray_size);
 		return type_to_array(type_type);
 	default:
 		sprintf(synerr_buffer,
@@ -730,7 +733,12 @@ void p_stmt() {
 		}
 
 		//ERR*
-		semerr("Assigment types do not match");
+		sprintf(synerr_buffer,
+				"Assignment types do not match (%s variable cannot be assigned %s value)",
+				get_type_desc(variable_type),
+				get_type_desc(expr_type));
+		semerr(synerr_buffer);
+
 		break;
 	case TOK_BEGIN:
 		p_cmpndstmt();
@@ -739,7 +747,10 @@ void p_stmt() {
 		match(TOK_IF);
 		expr_type = p_expr();
 		if(expr_type != TYPE_BOOL && expr_type != TYPE_ERR) {
-			semerr("if condition must be of type boolean");
+			sprintf(synerr_buffer,
+					"If-condition must be of type boolean (not %s)",
+					get_type_desc(expr_type));
+			semerr(synerr_buffer);
 		}
 		match(TOK_THEN);
 		p_stmt();
@@ -749,7 +760,10 @@ void p_stmt() {
 		match(TOK_WHILE);
 		expr_type = p_expr();
 		if(expr_type != TYPE_BOOL && expr_type != TYPE_ERR) {
-			semerr("while condition must be of type boolean");
+			sprintf(synerr_buffer,
+					"While-condition must be of type boolean (not %s)",
+					get_type_desc(expr_type));
+			semerr(synerr_buffer);
 		}
 		match(TOK_DO);
 		p_stmt();
@@ -810,7 +824,7 @@ int p_variable() {
 		}
 		if(is_fp_type(id_type)) {
 			//ERR*
-			semerr("cannot assign value to function parameter");
+			semerr("Function parameter cannot be on left-hand side of an assignment");
 			return TYPE_ERR;
 		}
 		if(id_type==TYPE_A_INT && variable_type==TYPE_ARRAY_INDEX) {
@@ -874,7 +888,10 @@ int p_variable_t() {
 		}
 
 		//ERR*
-		semerr("Array index must be integer");
+		sprintf(synerr_buffer,
+				"Array index must be integer (not %s)",
+				get_type_desc(expr_type));
+		semerr(synerr_buffer);
 		return TYPE_ERR;
 	case TOK_ASSIGNOP:
 		// nop
@@ -1009,7 +1026,11 @@ int p_expr() {
 		}
 
 		//ERR*
-		semerr("you can only compare matched types");
+		sprintf(synerr_buffer,
+				"RELOP can only be used on matching types (%s and %s are not matching)",
+				get_type_desc(smplexpr_type),
+				get_type_desc(expr_type));
+		semerr(synerr_buffer);
 		return TYPE_ERR;
 	case TOK_ADDOP:
 		if(tok->attribute==ADDOP_ADD || tok->attribute==ADDOP_SUBTRACT) {
@@ -1053,7 +1074,11 @@ int p_expr() {
 			}
 
 			//ERR*
-			semerr("you can only compare matched types");
+			sprintf(synerr_buffer,
+					"RELOP can only be used on matching types (%s and %s are not matching)",
+					get_type_desc(smplexpr_type),
+					get_type_desc(expr_type));
+			semerr(synerr_buffer);
 			return TYPE_ERR;
 		}
 	default:
@@ -1095,12 +1120,12 @@ int p_expr_t() {
 		}
 		if(smplexpr_type == TYPE_BOOL) {
 			//ERR*
-			semerr("can only compare boolean types with equal and not equal");
+			semerr("Can only compare boolean types with equal and not equal");
 			return TYPE_ERR;
 		}
 		if(smplexpr_type == TYPE_A_INT || smplexpr_type == TYPE_A_REAL) {
 			//ERR*
-			semerr("cannot compare array types");
+			semerr("Cannot compare array types");
 			return TYPE_ERR;
 		}
 		if(smplexpr_type == TYPE_ERR) {
@@ -1173,7 +1198,11 @@ int p_smplexpr() {
 			return TYPE_A_REAL;
 		}
 		//ERR*
-		semerr("Expression type mismatch");
+		sprintf(synerr_buffer,
+				"Expression type mismatch (%s and %s are not matching)",
+				get_type_desc(term_type),
+				get_type_desc(smplexpr_type));
+		semerr(synerr_buffer);
 		return TYPE_ERR;
 	case TOK_ADDOP:
 		if(tok->attribute==ADDOP_ADD || tok->attribute==ADDOP_SUBTRACT) {
@@ -1192,7 +1221,7 @@ int p_smplexpr() {
 			}
 			if(term_type == TYPE_BOOL) {
 				//ERR*
-				semerr("this language supports unsigned booleans only");
+				semerr("This language supports unsigned booleans only");
 				return TYPE_ERR;
 			}
 			if(term_type == TYPE_A_INT || term_type == TYPE_A_REAL) {
@@ -1202,7 +1231,11 @@ int p_smplexpr() {
 			}
 
 			//ERR*
-			semerr("Expression type mismatch");
+			sprintf(synerr_buffer,
+					"Expression type mismatch (%s and %s are not matching)",
+					get_type_desc(term_type),
+					get_type_desc(smplexpr_type));
+			semerr(synerr_buffer);
 			return TYPE_ERR;
 		}
 	default:
@@ -1240,7 +1273,7 @@ int p_smplexpr_t() {
 		}
 		if(term_type==TYPE_A_INT || term_type == TYPE_A_REAL) {
 			//ERR*
-			semerr("cannot perform arithmetic on array types");
+			semerr("Cannot perform arithmetic on array types");
 			return TYPE_ERR;
 		}
 		if((addop_attr==ADDOP_ADD || addop_attr==ADDOP_SUBTRACT)
@@ -1255,7 +1288,7 @@ int p_smplexpr_t() {
 		}
 		if(addop_attr == ADDOP_ADD || addop_attr == ADDOP_SUBTRACT) {
 			//ERR*
-			semerr("can only add and subtract numbers of the same type");
+			semerr("Can only add and subtract numbers of the same type");
 			return TYPE_ERR;
 		}
 		if(addop_attr == ADDOP_OR
@@ -1265,7 +1298,7 @@ int p_smplexpr_t() {
 		}
 		if(addop_attr ==ADDOP_OR) {
 			//ERR*
-			semerr("can only or boolean types");
+			semerr("can only OR boolean types");
 			return TYPE_ERR;
 		}
 		//???
@@ -1336,7 +1369,11 @@ int p_term() {
 			return TYPE_A_REAL;
 		}
 		//ERR*
-		semerr("Term type mismatch");
+		sprintf(synerr_buffer,
+				"Term type mismatch (%s and %s are not matching)",
+				get_type_desc(factor_type),
+				get_type_desc(term_type));
+		semerr(synerr_buffer);
 		return TYPE_ERR;
 	default:
 		sprintf(synerr_buffer,
@@ -1378,7 +1415,7 @@ int p_term_t() {
 				&& factor_type == TYPE_INT
 				&& (term_type == TYPE_INT || term_type == TYPE_OK)) {
 			//ERR*
-			semerr("cannot divide integers (use div or mod)");
+			semerr("Cannot divide integers (use div or mod)");
 			return TYPE_ERR;
 		}
 		if((mulop_attr == MULOP_MULTIPLY || mulop_attr == MULOP_DIVIDE)
@@ -1390,24 +1427,29 @@ int p_term_t() {
 						&& factor_type == TYPE_REAL
 						&& (term_type == TYPE_REAL || term_type == TYPE_OK)) {
 			//ERR*
-			semerr("cannot div or mod reals");
+			semerr("Cannot div or mod reals");
 			return TYPE_ERR;
 		}
 		if(factor_type == TYPE_A_INT || factor_type == TYPE_A_REAL) {
 			//ERR*
-			semerr("cannot perform arithmetic on array types");
+			semerr("Cannot perform arithmetic on array types");
 			return TYPE_ERR;
 		}
 		if(mulop_attr == MULOP_MULTIPLY || mulop_attr == MULOP_DIVIDE || mulop_attr == MULOP_MOD || mulop_attr == MULOP_DIV) {
 			//ERR*
-			semerr("can only perform multiply, divide, mod, and div on matched number types");
+			semerr("Can only perform multiply, divide, mod, and div on matched number types");
+			sprintf(synerr_buffer,
+					"Can only perform multiply, divide, mod, and div on matched number types (%s and %s are not matching)",
+					get_type_desc(factor_type),
+					get_type_desc(term_type));
+			semerr(synerr_buffer);
 		}
 		if(mulop_attr == MULOP_AND && factor_type == TYPE_BOOL && (term_type==TYPE_OK || term_type ==TYPE_BOOL)) {
 			return TYPE_BOOL;
 		}
 		if(mulop_attr == MULOP_AND) {
 			//ERR*
-			semerr("can only and boolean types");
+			semerr("Can only AND boolean types");
 			return TYPE_ERR;
 		}
 		//???
@@ -1497,7 +1539,7 @@ int p_factor() {
 		}
 		if(factor_type==TYPE_ARRAY_INDEX) {
 			//ERR*
-			semerr("cannot index non-array type");
+			semerr("Cannot index non-array type");
 			return TYPE_ERR;
 		}
 		//???
@@ -1523,7 +1565,7 @@ int p_factor() {
 			return TYPE_ERR;
 		}
 		//ERR*
-		semerr("Not can only be used on boolean types");
+		semerr("NOT can only be used on boolean types");
 		return TYPE_ERR;
 	default:
 		sprintf(synerr_buffer,
