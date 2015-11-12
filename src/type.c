@@ -1,9 +1,3 @@
-/*
- * type.c
- *
- *  Created on: Nov 7, 2015
- *      Author: Evan
- */
 
 #include "type.h"
 

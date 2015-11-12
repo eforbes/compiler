@@ -1,9 +1,3 @@
-/*
- * type.h
- *
- *  Created on: Nov 7, 2015
- *      Author: Evan
- */
 
 #ifndef TYPE_H_
 #define TYPE_H_

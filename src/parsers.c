@@ -294,7 +294,11 @@ int p_type() {
 			semerr("Array bounds must be integers");
 			return TYPE_ERR;
 		}
-		darray_size = n2_value - n1_value;
+		darray_size = n2_value - n1_value + 1;
+		if(darray_size<=0) {
+			semerr("Array size must be positive");
+			return TYPE_ERR;
+		}
 		return type_to_array(type_type);
 	default:
 		sprintf(synerr_buffer,
@@ -822,15 +826,10 @@ int p_variable() {
 			//ERR
 			return TYPE_ERR;
 		}
-		if(is_fp_type(id_type)) {
-			//ERR*
-			semerr("Function parameter cannot be on left-hand side of an assignment");
-			return TYPE_ERR;
-		}
-		if(id_type==TYPE_A_INT && variable_type==TYPE_ARRAY_INDEX) {
+		if((id_type==TYPE_A_INT||id_type==TYPE_FP_A_INT) && variable_type==TYPE_ARRAY_INDEX) {
 			return TYPE_INT;
 		}
-		if(id_type==TYPE_A_REAL && variable_type==TYPE_ARRAY_INDEX) {
+		if((id_type==TYPE_A_REAL||id_type==TYPE_FP_A_REAL) && variable_type==TYPE_ARRAY_INDEX) {
 			return TYPE_REAL;
 		}
 		if(variable_type==TYPE_ARRAY_INDEX) {
@@ -838,16 +837,16 @@ int p_variable() {
 			semerr("Cannot index non-array type");
 			return TYPE_ERR;
 		}
-		if(id_type == TYPE_A_INT && variable_type == TYPE_OK) {
+		if((id_type == TYPE_A_INT || id_type == TYPE_FP_A_INT) && variable_type == TYPE_OK) {
 			return TYPE_A_INT;
 		}
-		if(id_type == TYPE_A_REAL && variable_type == TYPE_OK) {
+		if((id_type == TYPE_A_REAL||id_type==TYPE_FP_A_REAL) && variable_type == TYPE_OK) {
 			return TYPE_A_REAL;
 		}
-		if(id_type == TYPE_INT && variable_type == TYPE_OK) {
+		if((id_type == TYPE_INT || id_type == TYPE_FP_INT) && variable_type == TYPE_OK) {
 			return TYPE_INT;
 		}
-		if(id_type == TYPE_REAL && variable_type == TYPE_OK) {
+		if((id_type == TYPE_REAL || id_type == TYPE_FP_REAL) && variable_type == TYPE_OK) {
 			return TYPE_REAL;
 		}
 		if(id_type == TYPE_F_NAME && variable_type == TYPE_OK) {
@@ -1298,7 +1297,7 @@ int p_smplexpr_t() {
 		}
 		if(addop_attr ==ADDOP_OR) {
 			//ERR*
-			semerr("can only OR boolean types");
+			semerr("Can only OR boolean types");
 			return TYPE_ERR;
 		}
 		//???
@@ -1437,7 +1436,6 @@ int p_term_t() {
 		}
 		if(mulop_attr == MULOP_MULTIPLY || mulop_attr == MULOP_DIVIDE || mulop_attr == MULOP_MOD || mulop_attr == MULOP_DIV) {
 			//ERR*
-			semerr("Can only perform multiply, divide, mod, and div on matched number types");
 			sprintf(synerr_buffer,
 					"Can only perform multiply, divide, mod, and div on matched number types (%s and %s are not matching)",
 					get_type_desc(factor_type),
