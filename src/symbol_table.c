@@ -158,8 +158,8 @@ void set_return_type(int rt) {
 
 //returns size of type in bits
 int get_size_of(int type) {
-	if(type==TYPE_INT || type==TYPE_A_INT) return 4*8;
-	if(type==TYPE_REAL || type == TYPE_A_REAL) return 8*8;
+	if(type==TYPE_INT || type==TYPE_A_INT) return 4;
+	if(type==TYPE_REAL || type == TYPE_A_REAL) return 8;
 
 	return 0;
 }

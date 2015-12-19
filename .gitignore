@@ -43,3 +43,6 @@ Temporary Items
 .apdisk
 
 Debug
+Release
+.settings
+.settings/language.settings.xml

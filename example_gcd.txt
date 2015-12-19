@@ -7,5 +7,5 @@ function gcd(a: integer; b: integer): integer;
 		else gcd := gcd(b, a mod b)
 	end;
 begin
-	result := gcd(x, y)
+	x := gcd(x, y)
 end.
